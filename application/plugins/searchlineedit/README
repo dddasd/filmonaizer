@@ -1,0 +1,11 @@
+SearchLineEdit v0.1
+
+LineEdit and SearchLineEdit are enhanced QLineEdit widgets for inputting text.
+
+LineEdit inherits from QLineEdit and implements the following
+additional functionalities: an inactiveText (displayed a grayed-out
+hinting text as long as the user didn't enter any text),
+ability to set widgets both on left and rigth side.
+
+SearchLineEdit inherits from LineEdit and implements the following
+additional functionalities: animated clear button and custom menu button.

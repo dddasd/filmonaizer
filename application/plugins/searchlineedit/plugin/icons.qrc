@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>icons/lineedit.png</file>
+        <file>icons/searchlineedit.png</file>
+        <file>icons/simplebutton.png</file>
+    </qresource>
+</RCC>

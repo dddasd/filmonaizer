@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>icons/clear.png</file>
+        <file>icons/magnify_glass.png</file>
+    </qresource>
+</RCC>
