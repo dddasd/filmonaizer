@@ -796,7 +796,7 @@ void MainWindow::save_description(bool saveBuf) {
                     if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
                         QMessageBox msgBox;
                         msgBox.setText(tr("The file already exists."));
-                        msgBox.setInformativeText(tr("Rewrite?")+"\n"+filename);
+                        msgBox.setInformativeText(tr("Rewrite?")+"\n"+QString(Fdir_result+"/result.txt"));
                         msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::Yes | QMessageBox::NoToAll | QMessageBox::No);
                         msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
                         msgBox.setButtonText(QMessageBox::No,tr("No"));
@@ -827,7 +827,7 @@ void MainWindow::save_description(bool saveBuf) {
                         }
                     }
                     file.open(QIODevice::WriteOnly);
-                    file.write(savedefault().toUtf8());
+                    file.write(defaul_templ().toUtf8());
                     file.close();
                 } else {
                     QString text_otb = "";
@@ -840,7 +840,7 @@ void MainWindow::save_description(bool saveBuf) {
 
 
 
-                    !доделать
+                    //!доделать
 
 
 

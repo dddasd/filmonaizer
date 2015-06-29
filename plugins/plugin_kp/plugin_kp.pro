@@ -1,14 +1,14 @@
 TEMPLATE        = lib
 CONFIG         += plugin
 QT             += core network
-INCLUDEPATH    += ../filmonaizer/src
+INCLUDEPATH    += ../../application/src
 HEADERS         = src/plugin.h \
-                ../filmonaizer/src/http_download.h
+                ../../application/src/http_download.h
 SOURCES         = src/plugin.cpp \
-                ../filmonaizer/src/http_download.cpp
+                ../../application/src/http_download.cpp
 TARGET          = plugin_kp
-DESTDIR         = ../../bin/plugins
+DESTDIR         = ../../../../bin/plugins
 
 # install
-target.path = ../../bin/plugins
+target.path = ../../../../bin/plugins
 INSTALLS += target
