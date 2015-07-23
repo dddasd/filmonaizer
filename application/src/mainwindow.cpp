@@ -589,11 +589,11 @@ void MainWindow::search_plugin() {
 }
 
 QString MainWindow::pars_template(QString file_name,
-                                  QString FSetNameFile,
-                                  QString FSetExtFile,
-                                  QString FSetCodec,
-                                  QString FSetPathSave,
-                                  int FSetSaveTo) {
+                                  QString &FSetNameFile,
+                                  QString &FSetExtFile,
+                                  QString &FSetCodec,
+                                  QString &FSetPathSave,
+                                  int &FSetSaveTo) {
     /*
     Global Settings:
     {;name_file}		имя файла
@@ -838,18 +838,152 @@ void MainWindow::save_description(bool saveBuf) {
                     int FsaveTo = (-1);
                     text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
 
+                    if (!checkBox_save_templates->isChecked()) {
+                        if (FpathSave.isEmpty()) {
+                            QMessageBox msgBox;
+                            msgBox.setText(tr("In pattern no tags {;path_save}, save in folder default?"));
+                            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                            msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
+                            msgBox.setButtonText(QMessageBox::No,tr("No"));
+                            msgBox.setDefaultButton(QMessageBox::Yes);
+                            msgBox.setIcon(QMessageBox::Question);
+                            switch (msgBox.exec()) {
+                                case QMessageBox::Yes: {
+                                    FpathSave = Fdir_result;
+                                    break;
+                                }
+                                default: {
+                                    label_icon->setText("<img src="":icons/new/tick-button.png"" />");
+                                    label_icon->setToolTip("");
+                                    //num_command = (-1);
+                                    //widget_off(true);
 
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        FpathSave = Fdir_result;
+                    }
 
-                    //!доделать
+                    if (!QDir(FpathSave).exists()) {
+                        if (!QDir().mkpath(FpathSave)) {
+                            QMessageBox msgBox;
+                            msgBox.setText(tr("Could not create the folder where you want to save the result, saving cancel."));
+                            msgBox.setInformativeText(FpathSave);
+                            msgBox.setStandardButtons(QMessageBox::Ok);
+                            msgBox.setButtonText(QMessageBox::Ok,tr("Ok"));
+                            msgBox.setDefaultButton(QMessageBox::Ok);
+                            msgBox.exec();
 
+                            label_icon->setText("<img src="":icons/new/minus-button.png"" />");
+                            label_icon->setToolTip(tr("Could not create the folder where you want to save the result, saving cancel."));
+                            //num_command=(-1);
+                            //widget_off(true);
 
+                            return;
+                        }
+                    }
 
+                    if (!FextFile.isEmpty()) {
+                        QRegExp regexp("[\\/:*?\"<>|]");
+                        FextFile.replace(regexp,"");
+                    } else FextFile = "txt";
 
+                    if (!FnameFile.isEmpty()) {
+                        QRegExp regexp("[\\/:*?\"<>|]");
+                        FnameFile.replace(regexp,"");
+                    } else FnameFile = "result";
 
+                    QString FAllSaveName(QDir::toNativeSeparators(FpathSave+"/"+FnameFile+"."+FextFile));
+                    QFile file(FAllSaveName);
 
+                    if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
+                        if (resave==0) {
+                            QMessageBox msgBox;
+                            msgBox.setText(tr("The file already exists."));
+                            msgBox.setInformativeText(tr("Rewrite?")+"\n"+FAllSaveName);
+                            msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::Yes | QMessageBox::NoToAll | QMessageBox::No);
+                            msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
+                            msgBox.setButtonText(QMessageBox::No,tr("No"));
+                            msgBox.setButtonText(QMessageBox::YesToAll,tr("Yes to all"));
+                            msgBox.setButtonText(QMessageBox::NoToAll,tr("No to all"));
+                            msgBox.setDefaultButton(QMessageBox::Ok);
+
+                            QString ext = QFileInfo(FAllSaveName).suffix();
+                            switch (msgBox.exec()) {
+                                case QMessageBox::Yes: break;
+
+                                case QMessageBox::YesToAll:
+                                    resave = 1;
+                                    break;
+
+                                case QMessageBox::NoToAll:
+                                    resave = 2;
+
+                                    FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                    for (int i=1;;i++) {
+                                        if (!file.exists(FAllSaveName+QString("(%1).").arg(i)+ext)) {
+                                            file.setFileName(FAllSaveName+QString("(%1).").arg(i)+ext);
+                                            break;
+                                        }
+                                    }
+                                    break;
+
+                                default:
+                                    FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                    for (int i=1;;i++) {
+                                        if (!file.exists(FAllSaveName+QString("(%1).").arg(i)+ext)) {
+                                            file.setFileName(FAllSaveName+QString("(%1).").arg(i)+ext);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                            }
+                            file.open(QIODevice::WriteOnly);
+                            if (Fcodec.isEmpty())
+                                file.write(text_otb.toUtf8());
+                            else {
+                                QTextCodec *c = QTextCodec::codecForName(Fcodec.toUtf8());
+                                file.write(c->fromUnicode(text_otb));
+                            }
+                            file.close();
+                        } else {
+                            if (resave==2) {
+                                QString ext = QFileInfo(FAllSaveName).suffix();
+                                FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                for (int i=1;;i++) {
+                                    if (!file.exists(FAllSaveName+QString("(%1).").arg(i)+ext)) {
+                                        file.setFileName(FAllSaveName+QString("(%1).").arg(i)+ext);
+                                        break;
+                                    }
+                                }
+                            }
+                            file.open(QIODevice::WriteOnly);
+                            if (Fcodec.isEmpty())
+                                file.write(text_otb.toUtf8());
+                            else {
+                                QTextCodec *c = QTextCodec::codecForName(Fcodec.toUtf8());
+                                file.write(c->fromUnicode(text_otb));
+                            }
+                            file.close();
+                        }
+
+                    } else {
+                        file.open(QIODevice::WriteOnly);
+                        if (Fcodec.isEmpty())
+                            file.write(text_otb.toUtf8());
+                        else {
+                            QTextCodec *c = QTextCodec::codecForName(Fcodec.toUtf8());
+                            file.write(c->fromUnicode(text_otb));
+                        }
+                        file.close();
+                    }
                 }
-                break;
             }
         }
     }
+
+    label_icon->setText("<img src="":icons/new/tick-button.png"" />");
+    label_icon->setToolTip("");
 }

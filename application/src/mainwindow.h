@@ -84,7 +84,7 @@ private:
 
     void create_item_tree_templ(QString,bool);
 
-    QString pars_template(QString,QString,QString,QString,QString,int);
+    QString pars_template(QString,QString&,QString&,QString&,QString&,int&);
 
     void save_description(bool);
 private slots:
