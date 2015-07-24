@@ -15,7 +15,7 @@ class AboutDialog : public QDialog, private Ui::Form_about
     Q_OBJECT
 
 public:
-    AboutDialog(int cur_l,bool prox = false,QString host = "",QString port = "",QString username = "",QString password = "",QWidget *parent = 0);
+    AboutDialog(QString cur_l,bool prox = false,QString host = "",QString port = "",QString username = "",QString password = "",QWidget *parent = 0);
 
 private:
 	http_download *http_d;
@@ -28,7 +28,7 @@ private:
     QString Fpassword;
 
 signals:
-    void ch_locale(int i);
+    void ch_locale(QString i);
 	void save_version(QString vr, int vr_c);
 
 private slots:

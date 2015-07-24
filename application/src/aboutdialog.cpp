@@ -1,6 +1,6 @@
 #include "aboutdialog.h"
 
-AboutDialog::AboutDialog(int cur_l,bool prox,QString host,QString port,QString username,QString password,QWidget *parent)
+AboutDialog::AboutDialog(QString cur_l,bool prox,QString host,QString port,QString username,QString password,QWidget *parent)
     : QDialog(parent)
 {
     setupUi(this);
@@ -11,7 +11,7 @@ AboutDialog::AboutDialog(int cur_l,bool prox,QString host,QString port,QString u
 
     label_main->setText(label_main->text().arg(qApp->applicationVersion()).arg(QT_VERSION_STR));
 
-    if (cur_l==0)
+    if (cur_l=="ru_RU")
         comboBox->setCurrentIndex(1);
     else
         comboBox->setCurrentIndex(0);
@@ -30,11 +30,11 @@ void AboutDialog::on_comboBox_activated(int index)
     if (index!=(-1)) {
         switch (index) {
             case 0: {
-                emit ch_locale(1);
+                emit ch_locale("en_US");
                 break;
             }
             case 1: {
-                emit ch_locale(0);
+                emit ch_locale("ru_RU");
                 break;
             }
         }

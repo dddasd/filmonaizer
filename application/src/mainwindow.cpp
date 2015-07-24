@@ -28,7 +28,8 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     if (!QDir(Fdir_plugins).exists()) QDir("").mkdir(Fdir_plugins);
 
     read_settings();
-    translation(0);
+
+    translation(Fcurrent_locale);
 
     search_plugin();
     if (FfileNamePlugins.isEmpty()) {
@@ -100,12 +101,12 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 
     menu_export = new QMenu;
     QAction *act_t;
-    act_t = menu_export->addAction(QIcon(":icons/buzz.png"),QString(tr("Send to Google Buzz")));
-    act_t->setObjectName("Action_bz");
+    //act_t = menu_export->addAction(QIcon(":icons/buzz.png"),QString(tr("Send to Google Buzz")));
+    //act_t->setObjectName("Action_bz");
     act_t = menu_export->addAction(QIcon(":icons/twitter.png"),QString(tr("Send to Twitter")));
     act_t->setObjectName("Action_tw");
-    act_t = menu_export->addAction(QIcon(":icons/ff.png"),QString(tr("Send to FriendFeed")));
-    act_t->setObjectName("Action_ff");
+    //act_t = menu_export->addAction(QIcon(":icons/ff.png"),QString(tr("Send to FriendFeed")));
+    //act_t->setObjectName("Action_ff");
     act_t = menu_export->addAction(QIcon(":icons/facebook.png"),QString(tr("Send to Facebook")));
     act_t->setObjectName("Action_fb");
     act_t = menu_export->addAction(QIcon(":icons/vkontakte.png"),QString(tr("Send to VKontakte")));
@@ -122,10 +123,21 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 
     lineEdit_dir_obzor->setText(Fdir_result);
 
+    if (FtemplateCheck) checkBox_save_templates->setCheckState(Qt::Checked);
+
+    if (FrewriteFile) radioButton_rewrite_yes->setChecked(true);
+    else radioButton_rewrite_question->setChecked(true);
+
     FparsCommand = (-1);
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow() {    
+    if (checkBox_save_templates->checkState()==Qt::Checked) FtemplateCheck = true;
+    else FtemplateCheck = false;
+
+    if (radioButton_rewrite_yes->isChecked()) FrewriteFile = true;
+    else FrewriteFile = false;
+
     write_settings();
 
     if (Fclear_tmp_exit) {
@@ -336,17 +348,6 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             movie->start();
             plugin_f->result_pars_movie(j,Fdir_tmp);
         }
-
-    /*for (int i=0;i<image_item.length();i++)
-        if (ret==image_item[i]) {
-            if (ret->childCount()>0)
-                return;
-            //get_coverlist(QString("http://www.kinopoisk.ru/film/%1/covers/").arg(res_search[i].url_f));
-            icon_ch = ret;
-            //image_zap.clear();
-            //timer->start();
-            return;
-        }*/
 }
 
 void MainWindow::on_pushButton_expand_clicked() {
@@ -415,7 +416,7 @@ void MainWindow::on_pushButton_about_clicked() {
     }
     ab->setAttribute(Qt::WA_DeleteOnClose);
     ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
-    connect(ab,SIGNAL(ch_locale(int)),this,SLOT(translation(int)));
+    connect(ab,SIGNAL(ch_locale(QString)),this,SLOT(translation(QString)));
     //connect(ab,SIGNAL(save_version(QString,int)),this,SLOT(save_version(QString,int)));
     ab->show();
 }
@@ -476,12 +477,13 @@ void MainWindow::read_settings() {
     settings.endArray();
 
     settings.beginGroup("main");
-    if (settings.value("locale","ru_RU").toString()=="ru_RU") Fcurrent_locale = 0;
-    else Fcurrent_locale = 1;
+    Fcurrent_locale = settings.value("locale","ru_RU").toString();
     Fclear_tmp_exit = settings.value("clear_tmp_exit",true).toBool();
     Fcurrent_plugins = settings.value("current_plugins","").toString();
     Fcurrent_proxy = settings.value("current_proxy",(-1)).toInt();
     Fproxy = settings.value("enable_proxy",false).toBool();
+    FtemplateCheck = settings.value("get_template",false).toBool();
+    FrewriteFile = settings.value("rewrite_a_file",false).toBool();
     settings.endGroup();
 }
 
@@ -522,18 +524,13 @@ void MainWindow::write_settings() {
 
     settings.remove("main");
     settings.beginGroup("main");
-    switch (Fcurrent_locale) {
-        case 1:
-            settings.setValue("locale","en_US");
-            break;
-        default:
-            settings.setValue("locale","ru_RU");
-            break;
-    }
+    settings.setValue("locale",Fcurrent_locale);
     settings.setValue("clear_tmp_exit",Fclear_tmp_exit);
     settings.setValue("current_plugins",Fcurrent_plugins);
     settings.setValue("current_proxy",Fcurrent_proxy);
     settings.setValue("enable_proxy",Fproxy);
+    settings.setValue("get_template",FtemplateCheck);
+    settings.setValue("rewrite_a_file",FrewriteFile);
     settings.endGroup();
 
     settings.sync();
@@ -554,27 +551,19 @@ void MainWindow::create_item_tree_templ(QString name, bool ch) {
     treeWidget_templates->insertTopLevelItem(0,new_item);
 }
 
-void MainWindow::translation(int i) {
-    qDebug() << QString("%1").arg(i);
-    switch (i) {
-        case 0: //ru
-            if (trans.load(Fdir_locale+QDir::separator()+"filmonaizer_ru_RU")) {
-                qApp->installTranslator(&trans);
-                retranslateUi(this);
-                Fcurrent_locale = 0;
-            }
-            break;
-        case 1: //eng
-            qApp->removeTranslator(&trans);
+void MainWindow::translation(QString i) {
+    qDebug() << i;
+    if (i == "ru_RU") {
+        if (trans.load(Fdir_locale+QDir::separator()+"filmonaizer_ru_RU")) {
+            qApp->installTranslator(&trans);
             retranslateUi(this);
-            Fcurrent_locale = 1;
-            break;
-        default: //eng
-            qApp->removeTranslator(&trans);
-            retranslateUi(this);
-            Fcurrent_locale = 1;
-            break;
+            Fcurrent_locale = i;
+            return;
+        }
     }
+    qApp->removeTranslator(&trans);
+    retranslateUi(this);
+    Fcurrent_locale = "en_US";
 }
 
 void MainWindow::search_plugin() {
@@ -641,7 +630,7 @@ QString MainWindow::pars_template(QString file_name,
             if (reg_exp.cap(2).indexOf("\"")!=(-1)) {
                 FnameFile = reg_exp.cap(2).replace("\"","");
             } else {
-                FnameFile = plugin_f->result_tags(QString("{%1}").arg(reg_exp.cap(2)));
+                FnameFile = plugin_f->result_tags(QString("{:%1}").arg(reg_exp.cap(2)));
             }
         }
 
@@ -673,7 +662,7 @@ QString MainWindow::pars_template(QString file_name,
     //\Search global tegs
 
     //
-    reg_exp.setPattern("\\{([^\\}]*)+\\}");
+    reg_exp.setPattern("\\{:([^\\}]*)+\\}");
     pos_r = reg_exp.indexIn(file_shab,0);
     while(pos_r!=(-1)) {
         QRegExp reg_exp_temp("([^\\(]*)+\\(");
@@ -724,9 +713,10 @@ void MainWindow::on_pushButton_savefile_clicked() {
 
         int i = (-1);
         for (int j = 0; j < film_item.length(); j++) {
+
             if ((treeWidget_search_result->currentItem() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])) {
+                (treeWidget_search_result->currentItem()->parent() == film_item[j])/* ||
+                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])*/) {
                 i = j;
                 break;
             }
@@ -748,8 +738,8 @@ void MainWindow::on_pushButton_savebuffer_clicked() {
         int i = (-1);
         for (int j = 0; j < film_item.length(); j++) {
             if ((treeWidget_search_result->currentItem() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])) {
+                (treeWidget_search_result->currentItem()->parent() == film_item[j])/* ||
+                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])*/) {
                 i = j;
                 break;
             }
@@ -838,7 +828,7 @@ void MainWindow::save_description(bool saveBuf) {
                     int FsaveTo = (-1);
                     text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
 
-                    if (!checkBox_save_templates->isChecked()) {
+                    if (checkBox_save_templates->isChecked()) {
                         if (FpathSave.isEmpty()) {
                             QMessageBox msgBox;
                             msgBox.setText(tr("In pattern no tags {;path_save}, save in folder default?"));

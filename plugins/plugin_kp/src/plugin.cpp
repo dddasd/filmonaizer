@@ -6,33 +6,33 @@ void PluginSearchKP::init_plug() {
 }
 
 void PluginSearchKP::clear_map() {
-    FmapTags.insert("{actor}","");
-    FmapTags.insert("{budget}","");
-    FmapTags.insert("{code_film_kp}","");
-    FmapTags.insert("{compositor}","");
-    FmapTags.insert("{country}","");
-    FmapTags.insert("{desc}","");
-    FmapTags.insert("{director}","");
-    FmapTags.insert("{dublicate}","");
-    FmapTags.insert("{genre}","");
-    FmapTags.insert("{operator}","");
-    FmapTags.insert("{premier_ru}","");
-    FmapTags.insert("{premier_world}","");
-    FmapTags.insert("{producer}","");
-    FmapTags.insert("{rating_imbd}","");
-    FmapTags.insert("{rating_kp}","");
-    FmapTags.insert("{rating_MPAA}","");
-    FmapTags.insert("{release_DVD}","");
-    FmapTags.insert("{scenario}","");
-    FmapTags.insert("{slogan}","");
-    FmapTags.insert("{time}","");
-    FmapTags.insert("{title_eng}","");
-    FmapTags.insert("{title_eng_clear}","");
-    FmapTags.insert("{title_eng_ru}","");
-    FmapTags.insert("{title_ru}","");
-    FmapTags.insert("{trailer}","");
-    FmapTags.insert("{url_kp}","");
-    FmapTags.insert("{year}","");
+    FmapTags.insert("{:actor}","");
+    FmapTags.insert("{:budget}","");
+    FmapTags.insert("{:code_film_kp}","");
+    FmapTags.insert("{:compositor}","");
+    FmapTags.insert("{:country}","");
+    FmapTags.insert("{:desc}","");
+    FmapTags.insert("{:director}","");
+    FmapTags.insert("{:dublicate}","");
+    FmapTags.insert("{:genre}","");
+    FmapTags.insert("{:operator}","");
+    FmapTags.insert("{:premier_ru}","");
+    FmapTags.insert("{:premier_world}","");
+    FmapTags.insert("{:producer}","");
+    FmapTags.insert("{:rating_imbd}","");
+    FmapTags.insert("{:rating_kp}","");
+    FmapTags.insert("{:rating_MPAA}","");
+    FmapTags.insert("{:release_DVD}","");
+    FmapTags.insert("{:scenario}","");
+    FmapTags.insert("{:slogan}","");
+    FmapTags.insert("{:time}","");
+    FmapTags.insert("{:title_eng}","");
+    FmapTags.insert("{:title_eng_clear}","");
+    FmapTags.insert("{:title_eng_ru}","");
+    FmapTags.insert("{:title_ru}","");
+    FmapTags.insert("{:trailer}","");
+    FmapTags.insert("{:url_kp}","");
+    FmapTags.insert("{:year}","");
 }
 
 void PluginSearchKP::set_proxy(bool proxy, QString host, QString port, QString username, QString password) {
@@ -76,6 +76,25 @@ void PluginSearchKP::result_pars_movie(int index, QString dir_tmp) {
         if (!file.exists(file.fileName())) {
             Fnum_com = 1;
             http_download *hd_search = new http_download(this,"http://www.kinopoisk.ru/film/"+res_search[index].url_f+"/",Fproxy,Fhost,Fport,Fusername,Fpassword);
+            connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+            hd_search->_download();
+
+        } else {
+            file.open(QIODevice::ReadOnly);
+            pars_film_result(file.readAll());
+            file.close();
+        }
+    }
+}
+
+void PluginSearchKP::result_search_small_image(int index, QString dir_tmp) {
+    if ((index >= 0) && (index < res_search.count())) {
+        FlistSmallMovie.clear();
+        Fdir_temp = dir_tmp;
+        QFile file(Fdir_temp+QDir::separator()+res_search[index].url_f+".sm");
+        if (!file.exists(file.fileName())) {
+            Fnum_com = 2;
+            http_download *hd_search = new http_download(this,"http://www.kinopoisk.ru/film/"+res_search[index].url_f+"/covers/",Fproxy,Fhost,Fport,Fusername,Fpassword);
             connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
             hd_search->_download();
 
@@ -156,6 +175,45 @@ void PluginSearchKP::fin_d(result_url ret_code) {
                 }
                 else {
                     emit m_Notifyer->signalPars(1,"not film ops return");
+                }
+            }
+            break;
+        }
+        case 2: {
+            if (ret_code.code_r!=0) {
+                //emit m_Notifyer->signalPars(1,ret_code.error_string);
+            }
+            else {
+                QRegExp rr ("film/([^\\D]\\d+)+\\D");
+                if (rr.indexIn(ret_code.url,0)!=(-1)) {
+                    QFile file(Fdir_temp+QDir::separator()+rr.cap(1)+".sm");
+                    if (!file.exists(file.fileName())) {
+                        file.open(QIODevice::WriteOnly);
+                        file.write(ret_code.buf_d);
+                        file.close();
+                    }
+                    pars_small_image(ret_code.buf_d);
+                    //emit m_Notifyer->signalPars(0,"");
+                }
+                else {
+                    //emit m_Notifyer->signalPars(1,"not film ops return");
+                }
+            }
+            break;
+        }
+        case 3: {
+            if (ret_code.code_r!=0) {
+                //emit m_Notifyer->signalPars(1,ret_code.error_string);
+            }
+            else {
+                for (int i = 0; i < FlistSmallImageFull.count(); i++) {
+                    if (FlistSmallImageFull[i].url == ret_code.url) {
+                        QFile file(FlistSmallImageFull[i].path_image);
+                        file.open(QIODevice::WriteOnly);
+                        file.write(ret_code.buf_d);
+                        file.close();
+                        break;
+                    }
                 }
             }
             break;
@@ -266,36 +324,36 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     QRegExp regexp("id_film[\\s]=[\\s]([^\\D]\\d+)+\\D");
     int pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{code_film_kp}"] = QString::fromLocal8Bit(regexp.cap(1).toLocal8Bit());
+        FmapTags["{:code_film_kp}"] = QString::fromLocal8Bit(regexp.cap(1).toLocal8Bit());
     }
 
-    if (!FmapTags["{code_film_kp}"].isEmpty()) {
-        FmapTags["{url_kp}"] = "http://www.kinopoisk.ru/film/"+FmapTags["{code_film_kp}"]+"/";
+    if (!FmapTags["{:code_film_kp}"].isEmpty()) {
+        FmapTags["{:url_kp}"] = "http://www.kinopoisk.ru/film/"+FmapTags["{:code_film_kp}"]+"/";
     }
 
     regexp.setPattern("<h1 class=\"moviename-big\" itemprop=\"name\">+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{title_ru}"] = html_decode(regexp.cap(1));
-        FmapTags["{title_ru}"].replace(QRegExp("\\s$"),"");
+        FmapTags["{:title_ru}"] = html_decode(regexp.cap(1));
+        FmapTags["{:title_ru}"].replace(QRegExp("\\s$"),"");
     }
 
     regexp.setPattern("<span itemprop=\"alternativeHeadline\">+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{title_eng}"] = html_decode(regexp.cap(1));
+        FmapTags["{:title_eng}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("год</td>+[^h]+[^>]+>+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{year}"] = html_decode(regexp.cap(1));
+        FmapTags["{:year}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("бюджет</td>+[^h]+[^>]+>+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{budget}"] = html_decode(regexp.cap(1));
+        FmapTags["{:budget}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("композитор</td>+[^>]+>+([^\\n]*)");
@@ -307,8 +365,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{compositor}"].isEmpty()) FmapTags["{compositor}"].append(",");
-                FmapTags["{compositor}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:compositor}"].isEmpty()) FmapTags["{:compositor}"].append(",");
+                FmapTags["{:compositor}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -323,8 +381,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {                
-                if (!FmapTags["{country}"].isEmpty()) FmapTags["{country}"].append(",");
-                FmapTags["{country}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:country}"].isEmpty()) FmapTags["{:country}"].append(",");
+                FmapTags["{:country}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -339,8 +397,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{director}"].isEmpty()) FmapTags["{director}"].append(",");
-                FmapTags["{director}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:director}"].isEmpty()) FmapTags["{:director}"].append(",");
+                FmapTags["{:director}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -349,12 +407,12 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     regexp.setPattern("GetTrailerPreview\\(\\{+[^,]+[\\D]+(\\d+)+[\\D]+(\\d+)+[^:]+[^\"]+\"+([^\"]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{trailer}"] = QString("<OBJECT><EMBED src=\"http://trailers.kinopoisk.ru/js"
+        FmapTags["{:trailer}"] = QString("<OBJECT><EMBED src=\"http://trailers.kinopoisk.ru/js"
                                 "/jw/player-licensed.swf\" type=\"application/x-shockwave-flash\" "
                                 "wmode=\"transparent\" width=\"%1\" height=\"%2\" "
                                 "allowfullscreen=\"true\" flashvars=\"file=http://www.kinopoisk.ru/gettrailer.php?id=%3"
                                 "\"></EMBED></OBJECT>").arg(regexp.cap(1)).arg(regexp.cap(2)).
-                                arg(FmapTags["{code_film_kp}"]+"%26tid="+regexp.cap(3));
+                                arg(FmapTags["{:code_film_kp}"]+"%26tid="+regexp.cap(3));
     }
 
     regexp.setPattern("<span itemprop=\"genre\">+([^\\n]*)");
@@ -366,8 +424,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{genre}"].isEmpty()) FmapTags["{genre}"].append(",");
-                FmapTags["{genre}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:genre}"].isEmpty()) FmapTags["{:genre}"].append(",");
+                FmapTags["{:genre}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -376,14 +434,14 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     regexp.setPattern("IMDb:+\\s+([^<]*)+<");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{rating_imbd}"] = regexp.cap(1);
+        FmapTags["{:rating_imbd}"] = regexp.cap(1);
     }
 
     regexp.setPattern("<span class=\"rating_ball\">+([^<]*)+[^>]+>+[^>]+>+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{rating_kp}"] = regexp.cap(1)+" ("+regexp.cap(2)+")";
-        FmapTags["{rating_kp}"].replace(QRegExp("&nbsp;"),"");
+        FmapTags["{:rating_kp}"] = regexp.cap(1)+" ("+regexp.cap(2)+")";
+        FmapTags["{:rating_kp}"].replace(QRegExp("&nbsp;"),"");
     }
 
     regexp.setPattern("оператор</td>+[^>]+>+([^\\n]*)");
@@ -395,8 +453,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {            
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{operator}"].isEmpty()) FmapTags["{operator}"].append(",");
-                FmapTags["{operator}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:operator}"].isEmpty()) FmapTags["{:operator}"].append(",");
+                FmapTags["{:operator}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -406,23 +464,23 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     regexp_desc.setMinimal(true);
     pos = regexp_desc.indexIn(buf_s,0);
     if(pos!=(-1)) {        
-        FmapTags["{desc}"] = html_decode(regexp_desc.cap(1));
+        FmapTags["{:desc}"] = html_decode(regexp_desc.cap(1));
         QRegExp regexp_br("<br.+>");
         regexp_br.setMinimal(true);
-        FmapTags["{desc}"] = FmapTags["{desc}"].replace(regexp_br,"");
-        FmapTags["{desc}"] = FmapTags["{desc}"].replace("<","");
+        FmapTags["{:desc}"] = FmapTags["{:desc}"].replace(regexp_br,"");
+        FmapTags["{:desc}"] = FmapTags["{:desc}"].replace("<","");
     }
 
     regexp.setPattern("data-ical-type=\"rus\"+[^\"]+\"+([^\"]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {        
-        FmapTags["{premier_ru}"] = html_decode(regexp.cap(1));
+        FmapTags["{:premier_ru}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("data-ical-type=\"world\"+[^\"]+\"+([^\"]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{premier_world}"] = html_decode(regexp.cap(1));
+        FmapTags["{:premier_world}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("продюсер</td>+[^>]+>+([^\\n]*)");
@@ -434,8 +492,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {            
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{producer}"].isEmpty()) FmapTags["{producer}"].append(",");
-                FmapTags["{producer}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:producer}"].isEmpty()) FmapTags["{:producer}"].append(",");
+                FmapTags["{:producer}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -445,13 +503,13 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     regexp_mraa.setMinimal(true);
     pos = regexp_mraa.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{rating_MPAA}"] = html_decode(regexp_mraa.cap(2));
+        FmapTags["{:rating_MPAA}"] = html_decode(regexp_mraa.cap(2));
     }
 
     regexp.setPattern("data-ical-type=\"dvd\"+[^\"]+\"+([^\"]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{release_DVD}"] = html_decode(regexp.cap(1));
+        FmapTags["{:release_DVD}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("сценарий</td>+[^>]+>+([^\\n]*)");
@@ -463,8 +521,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{scenario}"].isEmpty()) FmapTags["{scenario}"].append(",");
-                FmapTags["{scenario}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:scenario}"].isEmpty()) FmapTags["{:scenario}"].append(",");
+                FmapTags["{:scenario}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -473,13 +531,13 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
     regexp.setPattern("слоган</td>+[^>]+>+([^<]*)+</td>");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{slogan}"] = html_decode(regexp.cap(1));
+        FmapTags["{:slogan}"] = html_decode(regexp.cap(1));
     }
 
     regexp.setPattern("время</td>+[^>]+>+([^<]*)");
     pos = regexp.indexIn(buf_s,0);
     if(pos!=(-1)) {
-        FmapTags["{time}"] = html_decode(regexp.cap(1));
+        FmapTags["{:time}"] = html_decode(regexp.cap(1));
     }
 
     QRegExp regexp_actors1("В главных ролях:+.+<ul>+(.*)+</ul>");
@@ -493,8 +551,8 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{actor}"].isEmpty()) FmapTags["{actor}"].append(",");
-                FmapTags["{actor}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:actor}"].isEmpty()) FmapTags["{:actor}"].append(",");
+                FmapTags["{:actor}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
@@ -511,19 +569,19 @@ void PluginSearchKP::pars_film_result(QByteArray buf) {
         int i = _rr.indexIn(_ss,0);
         while(i!=(-1)) {
             if(_rr.cap(1)!="...") {
-                if (!FmapTags["{dublicate}"].isEmpty()) FmapTags["{dublicate}"].append(",");
-                FmapTags["{dublicate}"].append(html_decode(_rr.cap(1)));
+                if (!FmapTags["{:dublicate}"].isEmpty()) FmapTags["{:dublicate}"].append(",");
+                FmapTags["{:dublicate}"].append(html_decode(_rr.cap(1)));
             }
             i = _rr.indexIn(_ss,i+1);
         }
     }
 
-    if (FmapTags["{title_eng}"].isEmpty()) FmapTags["{title_eng_ru}"] = FmapTags["{title_ru}"];
-    else FmapTags["{title_eng_ru}"] = FmapTags["{title_eng}"];
+    if (FmapTags["{:title_eng}"].isEmpty()) FmapTags["{:title_eng_ru}"] = FmapTags["{:title_ru}"];
+    else FmapTags["{:title_eng_ru}"] = FmapTags["{:title_eng}"];
 
-    FmapTags["{title_eng_clear}"] = FmapTags["{title_eng}"];
-    FmapTags["{title_eng_clear}"].replace(QRegExp("\\W"),"");
-    FmapTags["{title_eng_clear}"] = FmapTags["{title_eng_clear}"].toLower();
+    FmapTags["{:title_eng_clear}"] = FmapTags["{:title_eng}"];
+    FmapTags["{:title_eng_clear}"].replace(QRegExp("\\W"),"");
+    FmapTags["{:title_eng_clear}"] = FmapTags["{:title_eng_clear}"].toLower();
 
     emit m_Notifyer->signalPars(0,"");
 }
@@ -698,6 +756,39 @@ QString PluginSearchKP::result_tags(QString tt) {
     else return "";
 }
 
+void PluginSearchKP::pars_small_image(QByteArray buf) {
+    QTextCodec *c;
+    c = QTextCodec::codecForHtml(buf);
+    QString buf_s(c->toUnicode(buf));
+
+    QRegExp regexp("<a href=\"/picture/+([\\d]*)+/\"><img+.+\"+([^\"]*)+\"");
+    regexp.setMinimal(true);
+    int pos = regexp.indexIn(buf_s,0);
+    while (pos!=(-1)) {
+        sm_image tmp_sm;
+        tmp_sm.id = regexp.cap(1).toInt();
+        tmp_sm.url = regexp.cap(2);
+        tmp_sm.path_image = QDir::toNativeSeparators(QString("%1/sm_%2.jpg").arg(Fdir_temp).arg(tmp_sm.id));
+        bool b = false;
+        for (int i = 0; i < FlistSmallImageFull.count();i++) {
+            if (FlistSmallImageFull[i].id == tmp_sm.id) {
+                b = true;
+                tmp_sm.path_image = FlistSmallImageFull[i].path_image;
+            }
+        }
+        FlistSmallMovie.append(tmp_sm);
+        if (!b) FlistSmallImageFull.append(tmp_sm);
+
+        if (!QFile(tmp_sm.path_image).exists()) {
+            Fnum_com = 3;
+            http_download *hd_search = new http_download(this,tmp_sm.url,Fproxy,Fhost,Fport,Fusername,Fpassword);
+            connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+            hd_search->_download();
+        }
+
+        pos = regexp.indexIn(buf_s,pos+1);
+    }
+}
 
 
 /*

@@ -20,6 +20,7 @@ public:
 signals:
     void signalSearch(QList<QString>,int,QString);
     void signalPars(int,QString);
+    void signalSmallImage(QList<QString>);
 };
 
 class PluginSearchKP: public QObject, QInterfacePluginSearch {
@@ -33,6 +34,7 @@ public:
 
     void result_search_movie(QString) Q_DECL_OVERRIDE; //Поиск фильма, аргумент - строка поиска
     void result_pars_movie(int,QString) Q_DECL_OVERRIDE; //Загрузка фильма, и возвращение результата в шаблоне
+    void result_search_small_image(int,QString) Q_DECL_OVERRIDE; //Загрузка мелких картинок
 
     QList<QString> listTags() Q_DECL_OVERRIDE; //Список тегов
 
@@ -53,6 +55,12 @@ private:
     struct sort_year {
         int index;
         int year;
+    };
+
+    struct sm_image {
+        int id;
+        QString url;
+        QString path_image;
     };
 
     NotifyerSearch *m_Notifyer;
@@ -79,11 +87,15 @@ private:
 
     QMap<QString,QString> FmapTags;
 
+    QList<sm_image> FlistSmallImageFull;
+    QList<sm_image> FlistSmallMovie;
+
     QString chartoascii(QString);
     void pars_search_result(QByteArray,QString);
     QString html_decode(QString);
     void pars_film_result(QByteArray buf);
     void clear_map();
+    void pars_small_image(QByteArray buf);
 private slots:
     void fin_d(result_url);
 };

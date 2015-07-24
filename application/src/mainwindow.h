@@ -64,7 +64,7 @@ private:
     QList<QString> Fhistory_search;
 
     //
-    int Fcurrent_locale;
+    QString Fcurrent_locale;
     QTranslator trans;
 
     //
@@ -73,6 +73,12 @@ private:
     //
     QStringList FfileNamePlugins;
     QString Fcurrent_plugins;
+
+    //
+    bool FtemplateCheck;
+
+    //
+    bool FrewriteFile;
 
     int FparsCommand; // 0 - превью окно, 1 - сохранить в файл, 2 - сохранить в буфер
 
@@ -99,7 +105,7 @@ private slots:
     void on_pushButton_about_clicked();
     void on_pushButton_set_proxy_clicked();
     void save_settings_proxy(bool,int,QList<struct_proxy_list>);
-    void translation(int);
+    void translation(QString);
     QString template_change(QString);
     void on_pushButton_savefile_clicked();
     void on_pushButton_savebuffer_clicked();
