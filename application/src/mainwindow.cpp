@@ -154,9 +154,9 @@ void MainWindow::slotSearch(QList<QString> ll,int ii, QString er) {
         label_icon->setText("<img src="":icons/new/tick-button.png"" />");
         label_icon->setToolTip("");
 
-        disconnect(treeWidget_search_result,SIGNAL(itemExpanded(QTreeWidgetItem*)),this,SLOT(_itemExpanded(QTreeWidgetItem*)));
-        disconnect(treeWidget_search_result,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this,SLOT(_itemCollapsed(QTreeWidgetItem*)));
-        disconnect(treeWidget_search_result,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(_itemDoubleClicked(QTreeWidgetItem*,int)));
+        disconnect(treeWidget_search_result,SIGNAL(itemExpanded(QTreeWidgetItem*)),this,SLOT(itemExpanded(QTreeWidgetItem*)));
+        disconnect(treeWidget_search_result,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this,SLOT(itemCollapsed(QTreeWidgetItem*)));
+        disconnect(treeWidget_search_result,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(itemDoubleClicked(QTreeWidgetItem*,int)));
 
         film_item.clear();
         desc_item.clear();
@@ -234,6 +234,7 @@ bool MainWindow::load_plugin(QString fileName) {
             QObject *ttt = plugin_f->notifyer();
             connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
             connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
+            connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
             Ftags_plug.clear();
             Ftags_plug = plugin_f->listTags();
             qDebug() << Ftags_plug;
@@ -296,6 +297,34 @@ void MainWindow::slotPars(int ii,QString err) {
     FparsCommand = (-1);
 }
 
+void MainWindow::slotSmallImage(int err, QList<QString> list) {
+    movie->stop();
+    image_item[FsmallImageClick]->setIcon(0,QIcon(":icons/image.png"));
+
+    if (err != 0) {
+        for (int i = 0; i < list.count(); i++) qDebug() << list[i];
+        label_icon->setText("<img src="":icons/new/minus-button.png"" />");
+        label_icon->setToolTip(tr("error small image"));
+        image_item[FsmallImageClick]->setIcon(0,QIcon(":icons/image.png"));
+        FsmallImageClick = (-1);
+        return;
+    }
+    if ((FsmallImageClick < 0) || (image_item.count() < FsmallImageClick)) return;
+    for (int i = 0; i < list.count(); i++) {
+        QTreeWidgetItem *new_item = new QTreeWidgetItem(image_item[FsmallImageClick]);
+        new_item->setText(0, list[i]);
+        new_item->setFlags(new_item->flags()|Qt::ItemIsUserCheckable);
+        new_item->setCheckState(0,Qt::Unchecked);
+        treeWidget_search_result->insertTopLevelItem(0,new_item);
+    }
+
+    image_item[FsmallImageClick]->setExpanded(true);
+    label_icon->setText("<img src="":icons/new/tick-button.png"" />");
+    label_icon->setToolTip("");
+
+    FsmallImageClick = (-1);
+}
+
 QString MainWindow::template_change(QString templ) {
     QString text_otb = "";
     QString FnameFile = "";
@@ -347,6 +376,20 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             icon_ch = ret;
             movie->start();
             plugin_f->result_pars_movie(j,Fdir_tmp);
+        }
+    for (int i=0;i<image_item.length();i++)
+        if (ret==image_item[i]) {
+            int j = (-1);
+            for (int k=0;k<film_item.length();k++)
+                if (ret->parent()==film_item[k]) {
+                    j=k;
+                    break;
+                }
+            if (j == (-1)) return;
+            FsmallImageClick = j;
+            icon_ch = ret;
+            movie->start();
+            plugin_f->result_search_small_image(j,Fdir_tmp);
         }
 }
 

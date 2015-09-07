@@ -82,6 +82,8 @@ private:
 
     int FparsCommand; // 0 - превью окно, 1 - сохранить в файл, 2 - сохранить в буфер
 
+    int FsmallImageClick; //id - куда кликнули
+
     void expanded(bool);
     QString defaul_templ();
 
@@ -96,6 +98,7 @@ private:
 private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
+    void slotSmallImage(int,QList<QString>);
     void on_pushButton_search_clicked();
     void setItemIcon(int);
     void itemExpanded(QTreeWidgetItem*);

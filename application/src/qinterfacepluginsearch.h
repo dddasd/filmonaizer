@@ -13,7 +13,7 @@ public:
 
     virtual void signalSearch(QList<QString>,int,QString) = 0;
     virtual void signalPars(int,QString) = 0;
-    virtual void signalSmallImage(QList<QString>) = 0;
+    virtual void signalSmallImage(int,QList<QString>) = 0;
 };
 
 class QInterfacePluginSearch

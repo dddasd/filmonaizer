@@ -1,8 +1,9 @@
 #include "http_download.h"
 
-http_download::http_download(QObject *parent, QString url, bool prox, QString host, QString port, QString username, QString password) {
+http_download::http_download(QObject *parent, QString url, int id_msg, bool prox, QString host, QString port, QString username, QString password) {
 	Q_UNUSED(parent);
     _res.url = url;
+    _res.id_msg = id_msg;
     _res.url_redirect.clear();
     _res.error_string.clear();
     _res.buf_d.clear();

@@ -35,7 +35,7 @@ private slots:
     void on_comboBox_activated(int index);
 	void get_updates();
 	void cancel_download();
-	void fin_d_version(result_url ret_code);
+    void fin_d_version(result_url ret_code);
 };
 
 #endif // ABOUTDIALOG_H

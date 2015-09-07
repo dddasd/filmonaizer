@@ -20,7 +20,7 @@ public:
 signals:
     void signalSearch(QList<QString>,int,QString);
     void signalPars(int,QString);
-    void signalSmallImage(QList<QString>);
+    void signalSmallImage(int,QList<QString>);
 };
 
 class PluginSearchKP: public QObject, QInterfacePluginSearch {
@@ -73,7 +73,7 @@ private:
     QString Fpassword;
 
     //Номер команды
-    int Fnum_com;
+    //int Fnum_com;
 
     //Папка с темп директорией
     QString Fdir_temp;
@@ -88,7 +88,6 @@ private:
     QMap<QString,QString> FmapTags;
 
     QList<sm_image> FlistSmallImageFull;
-    QList<sm_image> FlistSmallMovie;
 
     QString chartoascii(QString);
     void pars_search_result(QByteArray,QString);
@@ -96,6 +95,7 @@ private:
     void pars_film_result(QByteArray buf);
     void clear_map();
     void pars_small_image(QByteArray buf);
+    void pars_image(QByteArray buf);
 private slots:
     void fin_d(result_url);
 };

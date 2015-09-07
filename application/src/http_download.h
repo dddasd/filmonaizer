@@ -15,12 +15,13 @@ struct result_url {
     QString error_string;
     int code_r;
     QByteArray buf_d;
+    int id_msg;
 };
 
 class http_download: public QObject {
     Q_OBJECT
 public:
-    http_download(QObject *parent, QString url, bool prox = false, QString host = "", QString port = "", QString username = "", QString password = "");
+    http_download(QObject *parent, QString url, int id_msg = 0, bool prox = false, QString host = "", QString port = "", QString username = "", QString password = "");
     void _download();
 
 private:
