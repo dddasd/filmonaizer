@@ -235,6 +235,7 @@ bool MainWindow::load_plugin(QString fileName) {
             connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
             connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
             connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
+            connect(ttt,SIGNAL(signalDownloadImage(int,int)),this,SLOT(slotDownloadImage(int,int)));
             Ftags_plug.clear();
             Ftags_plug = plugin_f->listTags();
             qDebug() << Ftags_plug;
@@ -325,6 +326,12 @@ void MainWindow::slotSmallImage(int err, QList<QString> list) {
     FsmallImageClick = (-1);
 }
 
+void MainWindow::slotDownloadImage(int id,int err) {
+    if (form_pr_image != NULL) {
+        form_pr_image->DownloadComplete(id);
+    }
+}
+
 QString MainWindow::template_change(QString templ) {
     QString text_otb = "";
     QString FnameFile = "";
@@ -376,6 +383,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             icon_ch = ret;
             movie->start();
             plugin_f->result_pars_movie(j,Fdir_tmp);
+            return;
         }
     for (int i=0;i<image_item.length();i++)
         if (ret==image_item[i]) {
@@ -390,7 +398,27 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             icon_ch = ret;
             movie->start();
             plugin_f->result_search_small_image(j,Fdir_tmp);
+            return;
         }
+
+    QList<int> id_files;
+    QList<int> check_files;
+
+    for (int i=0;i<ret->parent()->childCount();i++) {
+        id_files << ret->parent()->child(i)->text(0).toInt();
+        if (ret->parent()->child(i)->checkState(0)==Qt::Checked)
+            check_files << 0;
+        else
+            check_files << 1;
+    }
+
+    form_pr_image = new PreviewCover(id_files,check_files,Fdir_tmp,ret->text(0).toInt(),this);
+    form_pr_image->setAttribute(Qt::WA_DeleteOnClose);
+    form_pr_image->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+    connect(form_pr_image,SIGNAL(download_image(int)),this,SLOT(slot_form_download_image(int)));
+    plugin_f->download_image(ret->text(0).toInt(),Fdir_tmp);
+    form_pr_image->show();
+    //form_pr_image = NULL;
 }
 
 void MainWindow::on_pushButton_expand_clicked() {
@@ -1019,4 +1047,66 @@ void MainWindow::save_description(bool saveBuf) {
 
     label_icon->setText("<img src="":icons/new/tick-button.png"" />");
     label_icon->setToolTip("");
+}
+
+void MainWindow::slot_form_download_image(int id) {
+    plugin_f->download_image(id,Fdir_tmp);
+}
+
+void MainWindow::on_pushButton_edit_templates_clicked() {
+    save_templates();
+    for (int i=0;i<treeWidget_templates->topLevelItemCount();i++)
+        if (treeWidget_templates->topLevelItem(i)==treeWidget_templates->currentItem()) {
+            Edit_Templates *ab;
+            if (i == 0) ab = new Edit_Templates(Fdir_templates,"",Ftags_plug,Ftags_mediafile,this);
+            else ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_plug,Ftags_mediafile,this);
+            ab->setAttribute(Qt::WA_DeleteOnClose);
+            ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+            ab->setWindowModality(Qt::ApplicationModal);
+            ab->show();
+            connect(ab,SIGNAL(destroyed(QObject*)),this,SLOT(search_templates()));
+            break;
+        }
+}
+
+void MainWindow::search_templates() {
+    QSettings settings(QDir::toNativeSeparators(Fdir_settings+"/settings.ini"),QSettings::IniFormat,0);
+
+    QDir dir = Fdir_templates;
+    QStringList name_filters;
+    name_filters << "*.txt";
+    QStringList fileNames = dir.entryList(name_filters,QDir::Files);
+    create_item_tree_templ("default",false);
+    for (int i = 0; i < fileNames.count(); i++) create_item_tree_templ(fileNames[i],false);
+    int size = settings.beginReadArray("template");
+    for (int i=0;i<size;i++) {
+        settings.setArrayIndex(i);
+        QString name = settings.value("name","").toString();
+        bool checked = settings.value("checked",false).toBool();
+        for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
+            if (name == treeWidget_templates->topLevelItem(i)->text(0)) {
+                if (checked) treeWidget_templates->topLevelItem(i)->setCheckState(0,Qt::Checked);
+            }
+        }
+    }
+    settings.endArray();
+}
+
+void MainWindow::save_templates() {
+    QSettings settings(QDir::toNativeSeparators(Fdir_settings+"/settings.ini"),QSettings::IniFormat,0);
+
+    settings.remove("template");
+    settings.beginWriteArray("template");
+    for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
+        settings.setArrayIndex(i);
+        settings.setValue("name",treeWidget_templates->topLevelItem(i)->text(0));
+        if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {
+            settings.setValue("checked",true);
+        } else {
+            settings.setValue("checked",false);
+        }
+    }
+    settings.endArray();
+
+    settings.sync();
 }

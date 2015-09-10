@@ -1,31 +1,20 @@
 #include "previewcover.h"
-/*
-PreviewCover::PreviewCover(bool pr,proxy_l pr_,QList<QString> name_files,QList<int> check,QString dir_tmp,int count_clicked, QWidget *parent)
-    : QDialog(parent)
-{
+
+PreviewCover::PreviewCover(QList<int> id_files, QList<int> check, QString dir_tmp, int id_clicked, QWidget *parent) : QDialog(parent) {
     setupUi(this);
-
     setModal(true);
-
-    proxy = pr;
-    proxy_list = pr_;
-
-    zagr_img = "";
-
-    im_download = false;
-    pushButton_savefile->setEnabled(im_download);
 
     this->setWindowFlags(Qt::Dialog | Qt::WindowSystemMenuHint);
 
     QList<QByteArray> rr = QImageReader::supportedImageFormats();
     qDebug() << rr;
-    int ii=0;
-    for(int i=0;i<rr.length();i++)
-        if ((rr[i]=="jpg") | (rr[i]=="jpeg")) {
-            ii=1;
+    int ii = 0;
+    for(int i = 0;i < rr.length();i++)
+        if ((rr[i] == "jpg") | (rr[i] == "jpeg")) {
+            ii = 1;
             break;
         }
-    if (ii==0) {
+    if (ii == 0) {
         QMessageBox msgBox;
         msgBox.setText(tr("Impossible viewing jpeg-files."));
         msgBox.setDetailedText(tr("No necessary libraries."));
@@ -40,10 +29,9 @@ PreviewCover::PreviewCover(bool pr,proxy_l pr_,QList<QString> name_files,QList<i
     cover_View->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     cover_View->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 
-    list_file = name_files;
-    list_check = check;
-    tek_img = count_clicked;
-
+    Fid_files = id_files;
+    Fcheck = check;
+    FcurrentImage = id_clicked;
 
     list_image_sm->clear();
     list_image_sm->setViewMode(QListView::IconMode);
@@ -51,54 +39,40 @@ PreviewCover::PreviewCover(bool pr,proxy_l pr_,QList<QString> name_files,QList<i
     list_image_sm->setIconSize(QSize(128, 128));
     list_image_sm->scrollBarWidgets(Qt::AlignHorizontal_Mask);
 
-    for(int i=0;i<list_file.length();i++) {
+    for(int i = 0;i < Fid_files.length();i++) {
         QListWidgetItem *newAC = new QListWidgetItem(list_image_sm);
         newAC->setFlags(newAC->flags() | Qt::ItemIsUserCheckable);
-        if (list_check[i]==0)
+        if (Fcheck[i]==0)
             newAC->setCheckState(Qt::Checked);
         else
             newAC->setCheckState(Qt::Unchecked);
-        newAC->setText(list_file[i]);
+        newAC->setText(QString("%1").arg(Fid_files[i]));
         list_image_sm->addItem(newAC);
-        if (tek_img==i)
-            list_image_sm->setCurrentItem(newAC,QItemSelectionModel::SelectCurrent);
+        if (FcurrentImage == Fid_files[i]) list_image_sm->setCurrentItem(newAC,QItemSelectionModel::SelectCurrent);
     }
 
-    dir = dir_tmp;
+    Fdir_tmp = dir_tmp;
 
-    for (int i=0;i<list_file.length();i++) {
-        if (!QFile::exists(dir+"/sm_"+list_file[i]+".jpg")) {
-            list_image_sm->item(i)->setIcon(QIcon(":icons/question_image_min.png"));
-            http_download *http = new http_download(this,"http://www.kinopoisk.ru/images/poster/sm_"+list_file[i]+".jpg",proxy,proxy_list.host,proxy_list.port,proxy_list.username,proxy_list.password);
-            connect(http,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
-            http->_download();
-        }
-        else
-            list_image_sm->item(i)->setIcon(QIcon(QPixmap(dir+"/sm_"+list_file[i]+".jpg")));
+    for (int i = 0; i < Fid_files.length();i++) {
+        QString name_file;
+        name_file = QDir::toNativeSeparators(QString("%1/sm_%2.jpg").arg(Fdir_tmp).arg(Fid_files[i]));
+        if (QFile::exists(name_file)) list_image_sm->item(i)->setIcon(QIcon(QPixmap(name_file)));
     }
 
-    if (QFile::exists(dir+"/"+list_file[tek_img]+".jpg")) {
-        im_download = true;
-        view_image(dir+"/"+list_file[tek_img]+".jpg");
-    }
-    else {
-        view_image();
-        http_download *http = new http_download(this,"http://www.kinopoisk.ru/images/poster/"+list_file[tek_img]+".jpg",proxy,proxy_list.host,proxy_list.port,proxy_list.username,proxy_list.password);
-        connect(http,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
-        http->_download();
-    }
-    connect(list_image_sm,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(_itemDoubleClicked(QListWidgetItem*)));
+    view_image(FcurrentImage);
+
+    connect(list_image_sm,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(itemDoubleClicked(QListWidgetItem*)));
 }
 
 PreviewCover::~PreviewCover()
 {
     for (int i=0;i<list_image_sm->count();i++) {
         if (list_image_sm->item(i)->checkState()==Qt::Checked)
-            list_check[i] = 0;
+            Fcheck[i] = 0;
         else
-            list_check[i] = 1;
+            Fcheck[i] = 1;
     }
-    check_stat(list_check);
+    emit check_stat(Fcheck);
 }
 
 void PreviewCover::on_pushButton_savefile_clicked()
@@ -107,24 +81,27 @@ void PreviewCover::on_pushButton_savefile_clicked()
                                                      qApp->applicationDirPath(),
                                                      tr("jpg files (*.jpg)"));
     if (!filename.isEmpty()) {
-        QFile::copy(zagr_img,filename);
+        QString name_file;
+        name_file = QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(FcurrentImage));
+        QFile::copy(name_file,filename);
     }
 }
 
-void PreviewCover::view_image(QString filename)
+void PreviewCover::view_image(int id_filename)
 {
-    zagr_img = filename;
-    if (filename.isEmpty()) {
+    if (id_filename == 0) {
         label_resolution->setText("");//tr("Preview cover"));
         QGraphicsScene *scene = new QGraphicsScene;
         cover_View->setScene(scene);
 
         cover_View->repaint();
 
-        zagr_im = false;
-    }
-    else {        
+        pushButton_savefile->setEnabled(false);
+    } else {
+        FcurrentImage = id_filename;
+
         QGraphicsScene *scene = new QGraphicsScene;
+        QString filename = QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(FcurrentImage));
         if (QFile::exists(filename)) {
             QPixmap pp;
             if (pp.load(filename)) {
@@ -150,14 +127,15 @@ void PreviewCover::view_image(QString filename)
                 matr.scale(scale,scale);
                 cover_View->setMatrix(matr);
 
-                zagr_im = true;
+                pushButton_savefile->setEnabled(true);
             }
             else {
                 qDebug() << "not load image";
                 cover_View->setScene(scene);
                 label_resolution->setText("");
 
-                zagr_im = false;
+                pushButton_savefile->setEnabled(false);
+                emit download_image(FcurrentImage);
             }
         }
         else {
@@ -165,19 +143,19 @@ void PreviewCover::view_image(QString filename)
             cover_View->setScene(scene);
             label_resolution->setText("");
 
-            zagr_im = false;
+            pushButton_savefile->setEnabled(false);
+            emit download_image(FcurrentImage);
         }
     }
 }
 
-void PreviewCover::on_pushButton_zoom_out_clicked()
-{
-    if (zagr_im) {
+void PreviewCover::on_pushButton_zoom_out_clicked() {
+    if (pushButton_savefile->isEnabled()) {
         QMatrix matr;
         if (scale>0.2)
             scale -= 0.1;
         QPixmap pix;
-        if (pix.load(zagr_img))
+        if (pix.load(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(FcurrentImage))))
             label_resolution->setText(QString("%1x%2 (%3%)").arg(pix.width()).arg(pix.height()).arg(int(scale*100)));
         else
             label_resolution->setText("");
@@ -187,14 +165,13 @@ void PreviewCover::on_pushButton_zoom_out_clicked()
     }
 }
 
-void PreviewCover::on_pushButton_zoom_in_clicked()
-{
-    if (zagr_im) {
+void PreviewCover::on_pushButton_zoom_in_clicked() {
+    if (pushButton_savefile->isEnabled()) {
         QMatrix matr;
         if (scale<3)
             scale +=0.1;
         QPixmap pix;
-        if (pix.load(zagr_img))
+        if (pix.load(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(FcurrentImage))))
             label_resolution->setText(QString("%1x%2 (%3%)").arg(pix.width()).arg(pix.height()).arg(int(scale*100)));
         else
             label_resolution->setText("");
@@ -204,60 +181,12 @@ void PreviewCover::on_pushButton_zoom_in_clicked()
     }
 }
 
-void PreviewCover::fin_d(result_url ret_code)
-{
-    if (ret_code.code_r==0) {
-        QRegExp reg_exp("sm_([\\d]*)");
-        if (reg_exp.indexIn(ret_code.url)!=(-1)) {
-            QFile file(dir+"/sm_"+reg_exp.cap(1)+".jpg");
-            qDebug() << QString(dir+"/sm_"+reg_exp.cap(1)+".jpg");
-            file.open(QIODevice::WriteOnly);
-            file.write(ret_code.buf_d);
-            file.close();
-
-            for (int i=0;i<list_image_sm->count();i++) {
-                if (list_image_sm->item(i)->text()==reg_exp.cap(1))
-                    list_image_sm->item(i)->setIcon(QIcon(QPixmap(dir+"/sm_"+list_file[i]+".jpg")));
-            }
-        }
-        else {
-            QRegExp re("\\d+");
-            if (re.indexIn(ret_code.url)!=(-1)) {
-                QFile file(dir+"/"+re.cap(0)+".jpg");
-                file.open(QIODevice::WriteOnly);
-                file.write(ret_code.buf_d);
-                file.close();
-                if (list_file[tek_img]==re.cap(0)) {
-                    im_download = true;
-                    pushButton_savefile->setEnabled(im_download);
-                    view_image(dir+"/"+re.cap(0)+".jpg");
-                }
-            }
-        }
-    }
+void PreviewCover::itemDoubleClicked(QListWidgetItem *ret) {
+    FcurrentImage = ret->text().toInt();
+    view_image(FcurrentImage);
 }
 
-void PreviewCover::_itemDoubleClicked(QListWidgetItem *ret)
-{
-    im_download = false;
-    for (int i=0;i<list_image_sm->count();i++)
-        if (list_image_sm->item(i)==ret)
-            tek_img=i;
-    if (QFile::exists(dir+"/"+ret->text()+".jpg")) {
-        im_download = true;
-        view_image(dir+"/"+ret->text()+".jpg");
-    }
-    else {
-        view_image();
-        http_download *http = new http_download(this,"http://www.kinopoisk.ru/images/poster/"+ret->text()+".jpg",proxy,proxy_list.host,proxy_list.port,proxy_list.username,proxy_list.password);
-        connect(http,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
-        http->_download();
-    }
-    pushButton_savefile->setEnabled(im_download);
-}
-
-void PreviewCover::wheelEvent(QWheelEvent *event)
-{
+void PreviewCover::wheelEvent(QWheelEvent *event) {
     QListWidget *child = static_cast<QListWidget*>(childAt(event->pos()));
     if (!child)
         return;
@@ -288,4 +217,7 @@ void PreviewCover::wheelEvent(QWheelEvent *event)
     }
     event->accept();
 }
-*/
+
+void PreviewCover::DownloadComplete(int id) {
+    if (id == FcurrentImage) view_image(FcurrentImage);
+}

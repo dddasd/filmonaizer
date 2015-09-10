@@ -10,19 +10,20 @@
 QFile file;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
-    Q_UNUSED(context);
+    //Q_UNUSED(context);
     switch (type) {
         case QtDebugMsg:
-            file.write(QString("%1 - Debug: %2\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).toUtf8());
+            file.write(QString("%1 - Debug: %2 (%3:%4, %5)\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).arg(context.file).arg(context.line).arg(context.function).toUtf8());
             break;
         case QtWarningMsg:
-            file.write(QString("%1 - Warning: %2\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).toUtf8());
+            file.write(QString("%1 - Warning: %2 (%3:%4, %5)\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).arg(context.file).arg(context.line).arg(context.function).toUtf8());
             break;
         case QtCriticalMsg:
-            file.write(QString("%1 - Critical: %2\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).toUtf8());
+            file.write(QString("%1 - Critical: %2 (%3:%4, %5)\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).arg(context.file).arg(context.line).arg(context.function).toUtf8());
             break;
         case QtFatalMsg:
-            file.write(QString("%1 - Fatal: %2\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).toUtf8());
+            file.write(QString("%1 - Fatal: %2 (%3:%4, %5)\n").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss")).arg(msg).arg(context.file).arg(context.line).arg(context.function).toUtf8());
+            file.flush();
             abort();
     }
     file.flush();

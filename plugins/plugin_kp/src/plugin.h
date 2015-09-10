@@ -21,6 +21,7 @@ signals:
     void signalSearch(QList<QString>,int,QString);
     void signalPars(int,QString);
     void signalSmallImage(int,QList<QString>);
+    void signalDownloadImage(int,int);
 };
 
 class PluginSearchKP: public QObject, QInterfacePluginSearch {
@@ -35,6 +36,8 @@ public:
     void result_search_movie(QString) Q_DECL_OVERRIDE; //Поиск фильма, аргумент - строка поиска
     void result_pars_movie(int,QString) Q_DECL_OVERRIDE; //Загрузка фильма, и возвращение результата в шаблоне
     void result_search_small_image(int,QString) Q_DECL_OVERRIDE; //Загрузка мелких картинок
+    void download_image(int,QString) Q_DECL_OVERRIDE; //Загрузить картинку по её ID
+    void download_all_image(QString) Q_DECL_OVERRIDE; //Загрузить все картинки (которые были найдены в мелких)
 
     QList<QString> listTags() Q_DECL_OVERRIDE; //Список тегов
 

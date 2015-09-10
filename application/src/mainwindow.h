@@ -22,6 +22,8 @@
 #include "previewdesc.h"
 #include "aboutdialog.h"
 #include "set_proxy.h"
+#include "previewcover.h"
+#include "edit_templates.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow_filmonaizer {
     Q_OBJECT
@@ -45,6 +47,8 @@ private:
     QPluginLoader pluginLoader;
 
     QList<QString> Ftags_plug;
+
+    QList<QString> Ftags_mediafile;
 
     QMovie *movie;
     QTreeWidgetItem *icon_ch;
@@ -84,11 +88,16 @@ private:
 
     int FsmallImageClick; //id - куда кликнули
 
+    PreviewCover *form_pr_image;
+
     void expanded(bool);
     QString defaul_templ();
 
     void read_settings();
     void write_settings();
+
+    void search_templates();
+    void save_templates();
 
     void create_item_tree_templ(QString,bool);
 
@@ -99,17 +108,27 @@ private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
     void slotSmallImage(int,QList<QString>);
-    void on_pushButton_search_clicked();
+    void slotDownloadImage(int,int);
+
     void setItemIcon(int);
+
     void itemExpanded(QTreeWidgetItem*);
     void itemCollapsed(QTreeWidgetItem*);
     void itemDoubleClicked(QTreeWidgetItem*,int);
+
+    void save_settings_proxy(bool,int,QList<struct_proxy_list>);
+
+    void translation(QString);
+
+    QString template_change(QString);
+
+    void slot_form_download_image(int id);
+
+    void on_pushButton_search_clicked();
+    void on_pushButton_savefile_clicked();
+    void on_pushButton_savebuffer_clicked();
     void on_pushButton_expand_clicked();
     void on_pushButton_about_clicked();
     void on_pushButton_set_proxy_clicked();
-    void save_settings_proxy(bool,int,QList<struct_proxy_list>);
-    void translation(QString);
-    QString template_change(QString);
-    void on_pushButton_savefile_clicked();
-    void on_pushButton_savebuffer_clicked();
+    void on_pushButton_edit_templates_clicked();
 };

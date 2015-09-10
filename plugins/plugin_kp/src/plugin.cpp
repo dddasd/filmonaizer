@@ -244,6 +244,7 @@ void PluginSearchKP::fin_d(result_url ret_code) {
                         file.write(ret_code.buf_d);
                         file.close();
                     }
+                    emit m_Notifyer->signalDownloadImage(rr.cap(1).toInt(),0);
                 }
             }
             break;
@@ -823,14 +824,6 @@ void PluginSearchKP::pars_small_image(QByteArray buf) {
 
     emit m_Notifyer->signalSmallImage(0,res_sm);
 
-    for (int i = 0; i < res_sm.count(); i++) {
-        if (!QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(res_sm[i]))).exists()) {
-            http_download *hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(res_sm[i]),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
-            connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
-            hd_search->_download();
-        }
-    }
-
     res_sm.clear();
 }
 
@@ -847,5 +840,29 @@ void PluginSearchKP::pars_image(QByteArray buf) {
         http_download *hd_search = new http_download(this,regexp.cap(1),5,Fproxy,Fhost,Fport,Fusername,Fpassword);
         connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
         hd_search->_download();
+    }
+}
+
+void PluginSearchKP::download_image(int id,QString dir_tmp) {
+    Fdir_temp = dir_tmp;
+    if (!QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(id))).exists()) {
+        http_download *hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
+        connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+        hd_search->_download();
+    } else {
+        emit m_Notifyer->signalDownloadImage(id,0);
+    }
+}
+
+void PluginSearchKP::download_all_image(QString dir_tmp) {
+    Fdir_temp = dir_tmp;
+    for (int i = 0; i < FlistSmallImageFull.count(); i++) {
+        if (!QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(FlistSmallImageFull[i].id))).exists()) {
+            http_download *hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(FlistSmallImageFull[i].id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
+            connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+            hd_search->_download();
+        } else {
+            emit m_Notifyer->signalDownloadImage(FlistSmallImageFull[i].id,0);
+        }
     }
 }

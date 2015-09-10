@@ -14,6 +14,7 @@ public:
     virtual void signalSearch(QList<QString>,int,QString) = 0;
     virtual void signalPars(int,QString) = 0;
     virtual void signalSmallImage(int,QList<QString>) = 0;
+    virtual void signalDownloadImage(int,int) = 0;
 };
 
 class QInterfacePluginSearch
@@ -29,6 +30,8 @@ public:
     virtual void result_search_movie(QString) = 0; //Поиск фильма, аргумент - строка поиска
     virtual void result_pars_movie(int,QString) = 0; //Загрузка фильма, и парсинг, аргумент - индекс найденного фильма
     virtual void result_search_small_image(int,QString) = 0; //Поиск картинок для предпросмотра, аргумент, индекс найденного фильма, папка темп
+    virtual void download_image(int,QString) = 0; //Загрузить картинку по её ID
+    virtual void download_all_image(QString) = 0; //Загрузить все картинки (которые были найдены в мелких)
 
     virtual QString result_tags(QString) = 0; //Возврат значение тега
 
