@@ -34,7 +34,7 @@ void Highlighter::highlightBlock(const QString &text)
     setCurrentBlockState(0);
 }
 
-Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent)
+Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QString> tags_global, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent)
     : QMainWindow(parent)
 {
     if (!file_templates.isEmpty())
@@ -183,11 +183,9 @@ Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QStrin
 	menu_tags->addMenu(menu_local_variables);
     menu_tags->addMenu(menu_mediainfo_variables);
 
-    for (int i=0;i<tags_plug_search.length();i++) {
-        QRegExp reg_exp1("\\{;([^\\}\\{$]*)\\}");
-        if (reg_exp1.indexIn(tags_plug_search[i],0)!=(-1)) menu_global_variables->addAction(tags_plug_search[i]);
-        else menu_local_variables->addAction(tags_plug_search[i]);
-	}
+    for (int i=0;i<tags_global.length();i++) menu_global_variables->addAction(tags_global[i]);
+
+    for (int i=0;i<tags_plug_search.length();i++) menu_local_variables->addAction(tags_plug_search[i]);
 
     for (int i=0;i<tags_plug_mediainfo.length();i++) menu_mediainfo_variables->addAction(tags_plug_mediainfo[i]);
 

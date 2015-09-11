@@ -121,7 +121,7 @@
     #ifdef _UNICODE
         #define MEDIAINFODLL_NAME L"MediaInfo.dll"
     #else //_UNICODE
-        #define MEDIAINFODLL_NAME "MediaInfo.dll"
+        #define MEDIAINFODLL_NAME L"MediaInfo.dll"
     #endif //_UNICODE
 #elif defined(__APPLE__) && defined(__MACH__)
     #define MEDIAINFODLL_NAME "libmediainfo.0.dylib"

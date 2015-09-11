@@ -31,8 +31,8 @@ public:
 };
 
 QT_BEGIN_NAMESPACE
-#define QInterfacePluginSearch_iid "FilmonaizerMovie"
-Q_DECLARE_INTERFACE(QInterfacePluginSearch, QInterfacePluginSearch_iid)
+#define QInterfacePluginMovie_iid "FilmonaizerMovie"
+Q_DECLARE_INTERFACE(QInterfacePluginMovie, QInterfacePluginMovie_iid)
 QT_END_NAMESPACE
 
 #endif // QINTERFACEPLUGINMOVIE

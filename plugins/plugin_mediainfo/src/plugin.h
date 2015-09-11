@@ -8,6 +8,7 @@
 #include <QList>
 #include <QDir>
 #include <QFile>
+#include <QDebug>
 
 #include "qinterfacepluginmovie.h"
 #include "MediaInfoDLL.h"
@@ -40,7 +41,7 @@ public:
         return m_Notifyer;
     }
 private:
-    NotifyerSearch *m_Notifyer;
+    NotifyerMovie *m_Notifyer;
 
     QMap<QString,QString> FmapTags;
 

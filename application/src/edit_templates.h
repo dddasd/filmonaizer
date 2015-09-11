@@ -52,7 +52,7 @@ class Edit_Templates : public QMainWindow
 {
     Q_OBJECT
 public:
-    Edit_Templates(QString dir, QString file_templates, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent = 0);
+    Edit_Templates(QString dir, QString file_templates, QList<QString> tags_global, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent = 0);
 
 protected:
     void closeEvent(QCloseEvent *event);

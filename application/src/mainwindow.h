@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QMap>
+#include <QList>
 #include <QDebug>
 #include <QMovie>
 #include <QTreeWidgetItem>
@@ -18,6 +19,7 @@
 #include <QFileInfo>
 
 #include "qinterfacepluginsearch.h"
+#include "qinterfacepluginmovie.h"
 
 #include "previewdesc.h"
 #include "aboutdialog.h"
@@ -33,7 +35,9 @@ public:
 
 private:
     void search_plugin();
-    bool load_plugin(QString);
+
+    bool load_plugin_search(QString);
+    bool load_plugin_movie(QString);
 
     QList<QTreeWidgetItem*> film_item;
     QList<QTreeWidgetItem*> desc_item;
@@ -43,12 +47,23 @@ private:
     QPushButton *button_expand;
     QMenu *menu_export;
 
-    QInterfacePluginSearch *plugin_f;
-    QPluginLoader pluginLoader;
+    QList<QString> Ffilename_plugin_search;
+    QList<QString> Ffilename_plugin_movie;
 
-    QList<QString> Ftags_plug;
+    QString Fcurrent_plugins_search;
+    QString Fcurrent_plugins_movie;
 
-    QList<QString> Ftags_mediafile;
+    QPluginLoader pluginLoaderSearch;
+    QPluginLoader pluginLoaderMovie;
+
+    QInterfacePluginSearch *plugin_search;
+    QInterfacePluginMovie *plugin_movie;
+
+    bool Fplug_movie_load;
+
+    QList<QString> Ftags_global; //теги глобальные
+    QList<QString> Ftags_plug; //теги плагина поиска
+    QList<QString> Ftags_mediafile; //теги плагина МедиаФайла
 
     QMovie *movie;
     QTreeWidgetItem *icon_ch;
@@ -74,9 +89,6 @@ private:
     //
     bool Fclear_tmp_exit;
 
-    //
-    QStringList FfileNamePlugins;
-    QString Fcurrent_plugins;
 
     //
     bool FtemplateCheck;
@@ -131,4 +143,5 @@ private slots:
     void on_pushButton_about_clicked();
     void on_pushButton_set_proxy_clicked();
     void on_pushButton_edit_templates_clicked();
+    void on_pushButton_movie_obzor_clicked();
 };

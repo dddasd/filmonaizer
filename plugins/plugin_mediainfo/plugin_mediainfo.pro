@@ -4,7 +4,7 @@ QT             += core
 INCLUDEPATH    += ../../application/src
 HEADERS         = src/plugin.h \
                 src/MediaInfoDLL.h
-SOURCES         = src/plugin.cpp \
+SOURCES         = src/plugin.cpp
 TARGET          = plugin_mediainfo
 DESTDIR         = ../../../../bin/plugins
 

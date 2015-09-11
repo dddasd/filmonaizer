@@ -3,6 +3,8 @@
 MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     setupUi(this);
 
+    Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}" << "{;save_to}";
+
     if (!p) {
         Fdir_settings = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer");
         Fdir_templates = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer/Templates");
@@ -31,31 +33,33 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 
     translation(Fcurrent_locale);
 
+
+    //Load Plugins
     search_plugin();
-    if (FfileNamePlugins.isEmpty()) {
+
+    if (Ffilename_plugin_search.isEmpty()) {
         QMessageBox msgBox(QMessageBox::Warning,tr("Fatal error"),tr("Not detected any plugins"),0,this);
         msgBox.addButton(QMessageBox::Ok);
         msgBox.exec();
         this->setEnabled(false);
-        Fcurrent_plugins = "";
+        Fcurrent_plugins_search = "";
         return;
     }
+
     bool plg = false;
-    for (int i = 0; i < FfileNamePlugins.count();i++) {
-        if (FfileNamePlugins[i] == Fcurrent_plugins) {
+    for (int i = 0; i < Ffilename_plugin_search.count(); i++) {
+        if (Fcurrent_plugins_search == Ffilename_plugin_search[i]) {
             plg = true;
             break;
         }
     }
+    if (!plg) Fcurrent_plugins_search = Ffilename_plugin_search[0];
+    plg = load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
     if (!plg) {
-        Fcurrent_plugins = FfileNamePlugins[0];
-    }
-    plg = load_plugin(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins));
-    if (!plg) {
-        for (int i = 0; i < FfileNamePlugins.count(); i++) {
-            plg = load_plugin(QDir::toNativeSeparators(Fdir_plugins+"/"+FfileNamePlugins[i]));
+        for (int i = 0; i < Ffilename_plugin_search.count(); i++) {
+            plg = load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
             if (plg) {
-                Fcurrent_plugins = FfileNamePlugins[i];
+                Fcurrent_plugins_search = Ffilename_plugin_search[i];
                 break;
             }
         }
@@ -64,10 +68,40 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
             msgBox.addButton(QMessageBox::Ok);
             msgBox.exec();
             this->setEnabled(false);
-            Fcurrent_plugins = "";
+            Fcurrent_plugins_search = "";
             return;
         }
     }
+
+    if (Ffilename_plugin_movie.isEmpty()) {
+        pushButton_movie_obzor->setEnabled(false);
+        qDebug() << "not loaded plugin MediaFile";
+    } else {
+        plg = false;
+        for (int i = 0; i < Ffilename_plugin_movie.count(); i++) {
+            if (Fcurrent_plugins_movie == Ffilename_plugin_movie[i]) {
+                plg = true;
+                break;
+            }
+        }
+        if (!plg) Fcurrent_plugins_movie = Ffilename_plugin_movie[0];
+        plg = load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
+        if (!plg) {
+            for (int i = 0; i < Ffilename_plugin_movie.count(); i++) {
+                plg = load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
+                if (plg) {
+                    Fcurrent_plugins_movie = Ffilename_plugin_search[i];
+                    break;
+                }
+            }
+            if (!plg) {
+                Fcurrent_plugins_movie = "";
+                qDebug() << "not loaded plugin MediaFile";
+            }
+        }
+        if (plg) pushButton_movie_obzor->setEnabled(true);
+    }
+    //Load Plgins end
 
     comboBox_history_movie->setLineEdit(searchLineEdit_movie);
 
@@ -212,37 +246,63 @@ void MainWindow::on_pushButton_search_clicked() {
             if ((Fcurrent_proxy < 0) && (Fcurrent_proxy >= Fproxy_list.count())) {
                 Fcurrent_proxy = 0;
             }
-            plugin_f->set_proxy(Fproxy,Fproxy_list[Fcurrent_proxy].host,Fproxy_list[Fcurrent_proxy].port,
+            plugin_search->set_proxy(Fproxy,Fproxy_list[Fcurrent_proxy].host,Fproxy_list[Fcurrent_proxy].port,
                                 Fproxy_list[Fcurrent_proxy].username,Fproxy_list[Fcurrent_proxy].password);
         } else {
-            plugin_f->set_proxy(false,"","","","");
+            plugin_search->set_proxy(false,"","","","");
         }
-        plugin_f->result_search_movie(searchLineEdit_movie->text());
+        plugin_search->result_search_movie(searchLineEdit_movie->text());
     }
 }
 
-bool MainWindow::load_plugin(QString fileName) {
+bool MainWindow::load_plugin_search(QString fileName) {
     if (!QFile(fileName).exists()) return false;
-    if (pluginLoader.isLoaded()) pluginLoader.unload();
-    pluginLoader.setFileName(fileName);
-    QObject *plugin = pluginLoader.instance();
+    if (pluginLoaderSearch.isLoaded()) pluginLoaderSearch.unload();
+    pluginLoaderSearch.setFileName(fileName);
+    QObject *plugin = pluginLoaderSearch.instance();
     if (plugin) {
-        plugin_f = qobject_cast<QInterfacePluginSearch *>(plugin);
-        if (!plugin_f) return false;
+        plugin_search = qobject_cast<QInterfacePluginSearch *>(plugin);
+        if (!plugin_search) return false;
         else {
-            plugin_f->init_plug();
-            QObject *ttt = plugin_f->notifyer();
+            plugin_search->init_plug();
+            QObject *ttt = plugin_search->notifyer();
             connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
             connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
             connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
             connect(ttt,SIGNAL(signalDownloadImage(int,int)),this,SLOT(slotDownloadImage(int,int)));
             Ftags_plug.clear();
-            Ftags_plug = plugin_f->listTags();
+            Ftags_plug = plugin_search->listTags();
             qDebug() << Ftags_plug;
             return true;
         }
     } else {
-        qDebug() << pluginLoader.errorString();
+        qDebug() << pluginLoaderSearch.errorString();
+        return false;
+    }
+}
+
+bool MainWindow::load_plugin_movie(QString fileName) {
+    if (!QFile(fileName).exists()) return false;
+    if (pluginLoaderMovie.isLoaded()) pluginLoaderMovie.unload();
+    pluginLoaderMovie.setFileName(fileName);
+    QObject *plugin = pluginLoaderMovie.instance();
+    if (plugin) {
+        plugin_movie = qobject_cast<QInterfacePluginMovie *>(plugin);
+        if (!plugin_movie) return false;
+        else {
+            plugin_movie->init_plug();
+            QObject *ttt = plugin_movie->notifyer();
+            //connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
+            //connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
+            //connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
+            //connect(ttt,SIGNAL(signalDownloadImage(int,int)),this,SLOT(slotDownloadImage(int,int)));
+            Ftags_mediafile.clear();
+            Ftags_mediafile = plugin_movie->listTags();
+            qDebug() << Ftags_mediafile;
+            return true;
+        }
+    } else {
+        qDebug() << pluginLoaderMovie.errorString();
         return false;
     }
 }
@@ -382,7 +442,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             FparsCommand = 0;
             icon_ch = ret;
             movie->start();
-            plugin_f->result_pars_movie(j,Fdir_tmp);
+            plugin_search->result_pars_movie(j,Fdir_tmp);
             return;
         }
     for (int i=0;i<image_item.length();i++)
@@ -397,7 +457,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             FsmallImageClick = j;
             icon_ch = ret;
             movie->start();
-            plugin_f->result_search_small_image(j,Fdir_tmp);
+            plugin_search->result_search_small_image(j,Fdir_tmp);
             return;
         }
 
@@ -416,7 +476,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
     form_pr_image->setAttribute(Qt::WA_DeleteOnClose);
     form_pr_image->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     connect(form_pr_image,SIGNAL(download_image(int)),this,SLOT(slot_form_download_image(int)));
-    plugin_f->download_image(ret->text(0).toInt(),Fdir_tmp);
+    plugin_search->download_image(ret->text(0).toInt(),Fdir_tmp);
     form_pr_image->show();
     //form_pr_image = NULL;
 }
@@ -469,7 +529,7 @@ void MainWindow::expanded(bool ex) {
 QString MainWindow::defaul_templ() {
     QString ret = "";
     for (int i = 0; i < Ftags_plug.count(); i++) {
-        ret.append(QString("%1 - %2\n").arg(Ftags_plug[i]).arg(plugin_f->result_tags(Ftags_plug[i])));
+        ret.append(QString("%1 - %2\n").arg(Ftags_plug[i]).arg(plugin_search->result_tags(Ftags_plug[i])));
     }
     return ret;
 }
@@ -550,11 +610,12 @@ void MainWindow::read_settings() {
     settings.beginGroup("main");
     Fcurrent_locale = settings.value("locale","ru_RU").toString();
     Fclear_tmp_exit = settings.value("clear_tmp_exit",true).toBool();
-    Fcurrent_plugins = settings.value("current_plugins","").toString();
     Fcurrent_proxy = settings.value("current_proxy",(-1)).toInt();
     Fproxy = settings.value("enable_proxy",false).toBool();
     FtemplateCheck = settings.value("get_template",false).toBool();
     FrewriteFile = settings.value("rewrite_a_file",false).toBool();
+    Fcurrent_plugins_movie = settings.value("plugin_movie","").toString();
+    Fcurrent_plugins_search = settings.value("plugin_search","").toString();
     settings.endGroup();
 }
 
@@ -597,11 +658,13 @@ void MainWindow::write_settings() {
     settings.beginGroup("main");
     settings.setValue("locale",Fcurrent_locale);
     settings.setValue("clear_tmp_exit",Fclear_tmp_exit);
-    settings.setValue("current_plugins",Fcurrent_plugins);
     settings.setValue("current_proxy",Fcurrent_proxy);
     settings.setValue("enable_proxy",Fproxy);
     settings.setValue("get_template",FtemplateCheck);
     settings.setValue("rewrite_a_file",FrewriteFile);
+    settings.setValue("plugin_movie",Fcurrent_plugins_movie);
+    settings.setValue("plugin_search",Fcurrent_plugins_search);
+
     settings.endGroup();
 
     settings.sync();
@@ -645,7 +708,40 @@ void MainWindow::search_plugin() {
 #else
     name_filters << "*.so";
 #endif
-    FfileNamePlugins = dir.entryList(name_filters,QDir::Files);
+    QStringList fileNamePlugins = dir.entryList(name_filters,QDir::Files);
+
+    for (int i = 0; i < fileNamePlugins.count(); i++) {
+        QString ff = QDir::toNativeSeparators(QString("%1/%2").arg(Fdir_plugins).arg(fileNamePlugins[i]));
+
+        //Search
+        if (pluginLoaderSearch.isLoaded()) pluginLoaderSearch.unload();
+        pluginLoaderSearch.setFileName(ff);
+        QObject *plugin = pluginLoaderSearch.instance();
+        if (plugin) {
+            plugin_search = qobject_cast<QInterfacePluginSearch *>(plugin);
+            if (plugin_search) {
+                Ffilename_plugin_search << fileNamePlugins[i];
+                continue;
+            }
+        }
+
+        //Movie
+        if (pluginLoaderMovie.isLoaded()) pluginLoaderMovie.unload();
+        pluginLoaderMovie.setFileName(ff);
+        plugin = pluginLoaderMovie.instance();
+        if (plugin) {
+            plugin_movie = qobject_cast<QInterfacePluginMovie *>(plugin);
+            if (plugin_movie) {
+                Ffilename_plugin_movie << fileNamePlugins[i];
+                continue;
+            }
+        }
+    }
+
+    qDebug() << fileNamePlugins;
+    qDebug() << Ffilename_plugin_search;
+    qDebug() << Ffilename_plugin_movie;
+
 }
 
 QString MainWindow::pars_template(QString file_name,
@@ -701,7 +797,7 @@ QString MainWindow::pars_template(QString file_name,
             if (reg_exp.cap(2).indexOf("\"")!=(-1)) {
                 FnameFile = reg_exp.cap(2).replace("\"","");
             } else {
-                FnameFile = plugin_f->result_tags(QString("{:%1}").arg(reg_exp.cap(2)));
+                FnameFile = plugin_search->result_tags(QString("{:%1}").arg(reg_exp.cap(2)));
             }
         }
 
@@ -755,7 +851,7 @@ QString MainWindow::pars_template(QString file_name,
                 pos_t = reg_exp_temp.indexIn(temp_str,0);
             }
 
-            QString str_r = plugin_f->result_tags(temp_str);
+            QString str_r = plugin_search->result_tags(temp_str);
             if (!razd.isEmpty()) str_r.replace(",",razd);
             if (length_m!=(-1)) {
                 if (str_r.length()>length_m) {
@@ -764,7 +860,7 @@ QString MainWindow::pars_template(QString file_name,
             }
             file_shab.replace(reg_exp.cap(0),str_r);
         } else {
-            file_shab.replace(reg_exp.cap(0),plugin_f->result_tags(reg_exp.cap(0)));
+            file_shab.replace(reg_exp.cap(0),plugin_search->result_tags(reg_exp.cap(0)));
         }
         pos_r = reg_exp.indexIn(file_shab,0);
     }
@@ -798,7 +894,7 @@ void MainWindow::on_pushButton_savefile_clicked() {
         }
 
         FparsCommand = 1;
-        plugin_f->result_pars_movie(i,Fdir_tmp);
+        plugin_search->result_pars_movie(i,Fdir_tmp);
     }
 }
 
@@ -821,7 +917,7 @@ void MainWindow::on_pushButton_savebuffer_clicked() {
         }
 
         FparsCommand = 2;
-        plugin_f->result_pars_movie(i,Fdir_tmp);
+        plugin_search->result_pars_movie(i,Fdir_tmp);
     }
 }
 
@@ -1050,7 +1146,7 @@ void MainWindow::save_description(bool saveBuf) {
 }
 
 void MainWindow::slot_form_download_image(int id) {
-    plugin_f->download_image(id,Fdir_tmp);
+    plugin_search->download_image(id,Fdir_tmp);
 }
 
 void MainWindow::on_pushButton_edit_templates_clicked() {
@@ -1058,8 +1154,8 @@ void MainWindow::on_pushButton_edit_templates_clicked() {
     for (int i=0;i<treeWidget_templates->topLevelItemCount();i++)
         if (treeWidget_templates->topLevelItem(i)==treeWidget_templates->currentItem()) {
             Edit_Templates *ab;
-            if (i == 0) ab = new Edit_Templates(Fdir_templates,"",Ftags_plug,Ftags_mediafile,this);
-            else ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_plug,Ftags_mediafile,this);
+            if (i == 0) ab = new Edit_Templates(Fdir_templates,"",Ftags_global,Ftags_plug,Ftags_mediafile,this);
+            else ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_global,Ftags_plug,Ftags_mediafile,this);
             ab->setAttribute(Qt::WA_DeleteOnClose);
             ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
             ab->setWindowModality(Qt::ApplicationModal);
@@ -1109,4 +1205,24 @@ void MainWindow::save_templates() {
     settings.endArray();
 
     settings.sync();
+}
+
+void MainWindow::on_pushButton_movie_obzor_clicked() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Select a movie"),
+                                                     qApp->applicationDirPath(),
+                                                     tr("All Files (*.*)"));
+    if (!filename.isEmpty()) {
+        plugin_movie->result_movie(filename);
+        pushButton_movie_obzor->setToolTip(filename);
+        pushButton_movie_obzor->setIcon(QIcon(":icons/inbox-film-ok.png"));
+
+        for (int i = 0; i < Ftags_mediafile.count(); i++) qDebug() << QString("%1 - %2").arg(Ftags_mediafile[i]).arg(plugin_movie->result_tags(Ftags_mediafile[i]));
+    }
+    else {
+        if (pushButton_movie_obzor->toolTip().isEmpty()) {
+            plugin_movie->init_plug();
+            pushButton_movie_obzor->setToolTip("");
+            pushButton_movie_obzor->setIcon(QIcon(":icons/inbox-film.png"));
+        }
+    }
 }
