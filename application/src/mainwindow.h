@@ -34,11 +34,8 @@ public:
     ~MainWindow();
 
 private:
-    void search_plugin();
 
-    bool load_plugin_search(QString);
-    bool load_plugin_movie(QString);
-
+/*Forms*/
     QList<QTreeWidgetItem*> film_item;
     QList<QTreeWidgetItem*> desc_item;
     QList<QTreeWidgetItem*> image_item;
@@ -47,6 +44,18 @@ private:
     QPushButton *button_expand;
     QMenu *menu_export;
 
+    QMovie *movie;
+    QTreeWidgetItem *icon_ch;
+
+    bool expand_s;
+    int expand, collapse;
+
+    QTranslator trans;
+
+    PreviewCover *form_pr_image;
+/*\Forms*/
+
+/*Plugins*/
     QList<QString> Ffilename_plugin_search;
     QList<QString> Ffilename_plugin_movie;
 
@@ -64,43 +73,35 @@ private:
     QList<QString> Ftags_global; //теги глобальные
     QList<QString> Ftags_plug; //теги плагина поиска
     QList<QString> Ftags_mediafile; //теги плагина МедиаФайла
+/*\Plugins*/
 
-    QMovie *movie;
-    QTreeWidgetItem *icon_ch;
-
+/*Settings*/
     QString Fdir_tmp, Fdir_settings, Fdir_templates, Fdir_locale, Fdir_result, Fdir_plugins;
-
-    bool expand_s;
-    int expand, collapse;
-
     //PROXY
     bool Fproxy;
     int Fcurrent_proxy;
     QList<struct_proxy_list> Fproxy_list;
-    ////
-
-    //
     QList<QString> Fhistory_search;
-
-    //
     QString Fcurrent_locale;
-    QTranslator trans;
-
-    //
-    bool Fclear_tmp_exit;
-
-
-    //
+    bool Fclear_tmp_exit;  
     bool FtemplateCheck;
-
-    //
     bool FrewriteFile;
+    bool FSavingModeTraffic;
+/*\Settings*/
+
+    QList<QString> FimageDownload; //список картинок которые нужно скачать
+    QList<QString> FimageDownloadDone; //Список скачанных картинок
 
     int FparsCommand; // 0 - превью окно, 1 - сохранить в файл, 2 - сохранить в буфер
 
     int FsmallImageClick; //id - куда кликнули
 
-    PreviewCover *form_pr_image;
+    int FCountMovie;
+
+    void search_plugin();
+
+    bool load_plugin_search(QString);
+    bool load_plugin_movie(QString);
 
     void expanded(bool);
     QString defaul_templ();
@@ -113,7 +114,7 @@ private:
 
     void create_item_tree_templ(QString,bool);
 
-    QString pars_template(QString,QString&,QString&,QString&,QString&,int&);
+    QString pars_template(QString,QString&,QString&,QString&,QString&,QString&,int&,int&);
 
     void save_description(bool);
 private slots:

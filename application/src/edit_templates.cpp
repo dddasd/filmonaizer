@@ -12,7 +12,7 @@ Highlighter::Highlighter(QTextDocument *parent)
     HighlightingRule hh;
 
     hh.format = tagsFormat;
-    hh.pattern = QRegExp("\\{([^\\}\\{$]*)\\}");
+    hh.pattern = QRegExp("\\{:([^\\}\\{$]*)\\}");
     highlightingRules.append(hh);
 
     hh.format = globaltagsFormat;

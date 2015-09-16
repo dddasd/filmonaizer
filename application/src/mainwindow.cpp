@@ -3,7 +3,7 @@
 MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     setupUi(this);
 
-    Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}" << "{;save_to}";
+    Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}" << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}";
 
     if (!p) {
         Fdir_settings = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer");
@@ -162,7 +162,11 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     if (FrewriteFile) radioButton_rewrite_yes->setChecked(true);
     else radioButton_rewrite_question->setChecked(true);
 
+    if (FSavingModeTraffic) checkBox_saving_mode_traffic->setCheckState(Qt::Checked);
+
     FparsCommand = (-1);
+
+    FimageDownload.clear();
 }
 
 MainWindow::~MainWindow() {    
@@ -171,6 +175,9 @@ MainWindow::~MainWindow() {
 
     if (radioButton_rewrite_yes->isChecked()) FrewriteFile = true;
     else FrewriteFile = false;
+
+    if (checkBox_saving_mode_traffic->checkState()==Qt::Checked) FSavingModeTraffic = true;
+    else FSavingModeTraffic = false;
 
     write_settings();
 
@@ -291,7 +298,7 @@ bool MainWindow::load_plugin_movie(QString fileName) {
         if (!plugin_movie) return false;
         else {
             plugin_movie->init_plug();
-            QObject *ttt = plugin_movie->notifyer();
+            //QObject *ttt = plugin_movie->notifyer();
             //connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
             //connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
             //connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
@@ -331,9 +338,12 @@ void MainWindow::slotPars(int ii,QString err) {
                 QString FextFile = "";
                 QString Fcodec = "";
                 QString FpathSave = "";
+                QString FnameFileCover = "";
                 int FsaveTo = (-1);
+                int FsaveCover = (-1);
+
                 if (j==0) text_otb = defaul_templ();
-                else text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
+                else text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                 Previewdesc *prev = new Previewdesc(text_otb,"",templ,j);
                 prev->setAttribute(Qt::WA_DeleteOnClose);
@@ -379,6 +389,8 @@ void MainWindow::slotSmallImage(int err, QList<QString> list) {
         treeWidget_search_result->insertTopLevelItem(0,new_item);
     }
 
+    if (checkBox_saving_mode_traffic->checkState() == Qt::Unchecked) plugin_search->download_all_image(Fdir_tmp);
+
     image_item[FsmallImageClick]->setExpanded(true);
     label_icon->setText("<img src="":icons/new/tick-button.png"" />");
     label_icon->setToolTip("");
@@ -390,6 +402,15 @@ void MainWindow::slotDownloadImage(int id,int err) {
     if (form_pr_image != NULL) {
         form_pr_image->DownloadComplete(id);
     }
+    if (!FimageDownload.isEmpty()) {
+        if (FimageDownload.removeOne(QString("%1").arg(id))) {
+            FimageDownloadDone << QString("%1").arg(id);
+        }
+        if (FimageDownload.isEmpty()) {
+            FparsCommand = 1;
+            plugin_search->result_pars_movie(FCountMovie,Fdir_tmp);
+        }
+    }
 }
 
 QString MainWindow::template_change(QString templ) {
@@ -398,9 +419,11 @@ QString MainWindow::template_change(QString templ) {
     QString FextFile = "";
     QString Fcodec = "";
     QString FpathSave = "";
+    QString FnameFileCover = "";
     int FsaveTo = (-1);
+    int FsaveCover = (-1);
     if (templ=="default") text_otb = defaul_templ();
-    else text_otb = pars_template(Fdir_templates+"/"+templ,FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
+    else text_otb = pars_template(Fdir_templates+"/"+templ,FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
     return text_otb;
 }
@@ -431,33 +454,19 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
         if (ret==film_item[i])
             return;
     for (int i=0;i<desc_item.length();i++)
-        if (ret==desc_item[i]) {
-            int j = (-1);
-            for (int k=0;k<film_item.length();k++)
-                if (ret->parent()==film_item[k]) {
-                    j=k;
-                    break;
-                }
-            if (j == (-1)) return;
+        if (ret==desc_item[i]) {            
             FparsCommand = 0;
             icon_ch = ret;
             movie->start();
-            plugin_search->result_pars_movie(j,Fdir_tmp);
+            plugin_search->result_pars_movie(i,Fdir_tmp);
             return;
         }
     for (int i=0;i<image_item.length();i++)
         if (ret==image_item[i]) {
-            int j = (-1);
-            for (int k=0;k<film_item.length();k++)
-                if (ret->parent()==film_item[k]) {
-                    j=k;
-                    break;
-                }
-            if (j == (-1)) return;
-            FsmallImageClick = j;
+            FsmallImageClick = i;
             icon_ch = ret;
             movie->start();
-            plugin_search->result_search_small_image(j,Fdir_tmp);
+            plugin_search->result_search_small_image(i,Fdir_tmp);
             return;
         }
 
@@ -497,7 +506,7 @@ void MainWindow::expanded(bool ex) {
         pushButton_about->setVisible(false);
         pushButton_set_proxy->setVisible(false);
         pushButton_packet_file->setVisible(false);
-
+        checkBox_saving_mode_traffic->setVisible(false);
 
         this->setMinimumSize(this->width(),expand);
         this->setMaximumSize(this->width(),expand);
@@ -515,6 +524,7 @@ void MainWindow::expanded(bool ex) {
         pushButton_about->setVisible(true);
         pushButton_set_proxy->setVisible(true);
         pushButton_packet_file->setVisible(true);
+        checkBox_saving_mode_traffic->setVisible(true);
 
         this->setMinimumSize(this->width(),collapse);
         this->setMaximumSize(this->width(),collapse);
@@ -616,6 +626,7 @@ void MainWindow::read_settings() {
     FrewriteFile = settings.value("rewrite_a_file",false).toBool();
     Fcurrent_plugins_movie = settings.value("plugin_movie","").toString();
     Fcurrent_plugins_search = settings.value("plugin_search","").toString();
+    FSavingModeTraffic = settings.value("saving_mode_traffic",false).toBool();
     settings.endGroup();
 }
 
@@ -664,7 +675,7 @@ void MainWindow::write_settings() {
     settings.setValue("rewrite_a_file",FrewriteFile);
     settings.setValue("plugin_movie",Fcurrent_plugins_movie);
     settings.setValue("plugin_search",Fcurrent_plugins_search);
-
+    settings.setValue("saving_mode_traffic",FSavingModeTraffic);
     settings.endGroup();
 
     settings.sync();
@@ -749,7 +760,9 @@ QString MainWindow::pars_template(QString file_name,
                                   QString &FSetExtFile,
                                   QString &FSetCodec,
                                   QString &FSetPathSave,
-                                  int &FSetSaveTo) {
+                                  QString &FSetNameFileCover,
+                                  int &FSetSaveTo,
+                                  int &FSetSaveCover) {
     /*
     Global Settings:
     {;name_file}		имя файла
@@ -758,11 +771,11 @@ QString MainWindow::pars_template(QString file_name,
     {;codec}			кодировка в которой сохранять
     {;path_save}		путь до директории, в которую сохраняем файлы
     {;save_to}			вариант сохранения: 0 - в буфер, 1 - в файл, 2 - в оба места
+    {;save_cover}		сохранять обложки или нет: 0 - сохранять, 1 - не сохранять
+    {;name_file_cover}	имя файла обложки
 
     {;custom}			пользовательские переменные (не реализовано)
-    {;use_short_url}	использовать сервер коротких ссылок (отключено) (не реализовано)
-    {;save_cover}		сохранять обложки или нет: 0 - сохранять, 1 - не сохранять (не реализовано)
-    {;name_file_cover}	имя файла обложки (не реализовано)*/
+    {;use_short_url}	использовать сервер коротких ссылок (отключено) (не реализовано)*/
 
     QFile file_s;
     file_s.setFileName(QDir::toNativeSeparators(file_name));
@@ -786,7 +799,9 @@ QString MainWindow::pars_template(QString file_name,
     QString FcutEnd = "";
     QString Fcodec = "";
     QString FpathSave = "";
+    QString FnameFileCover = "";
     int FsaveTo = (-1);
+    int FsaveCover = (-1);
 
     //Search global tegs
     QRegExp reg_exp("\\{;([^=]*)=([^}]*)\\}+(.*)\\n");
@@ -798,6 +813,14 @@ QString MainWindow::pars_template(QString file_name,
                 FnameFile = reg_exp.cap(2).replace("\"","");
             } else {
                 FnameFile = plugin_search->result_tags(QString("{:%1}").arg(reg_exp.cap(2)));
+            }
+        }
+
+        if (reg_exp.cap(1)=="name_file_cover") {
+            if (reg_exp.cap(2).indexOf("\"")!=(-1)) {
+                FnameFileCover = reg_exp.cap(2).replace("\"","");
+            } else {
+                FnameFileCover = plugin_search->result_tags(QString("{:%1}").arg(reg_exp.cap(2)));
             }
         }
 
@@ -821,6 +844,12 @@ QString MainWindow::pars_template(QString file_name,
             bool b = false;
             FsaveTo = reg_exp.cap(2).toInt(&b);
             if (!b) FsaveTo = (-1);
+        }
+
+        if (reg_exp.cap(1)=="save_cover") {
+            bool b = false;
+            FsaveCover = reg_exp.cap(2).toInt(&b);
+            if (!b) FsaveCover = (-1);
         }
 
         file_shab.replace(reg_exp.cap(0),"");
@@ -852,6 +881,7 @@ QString MainWindow::pars_template(QString file_name,
             }
 
             QString str_r = plugin_search->result_tags(temp_str);
+            if (str_r.isEmpty()) str_r = plugin_movie->result_tags(temp_str);
             if (!razd.isEmpty()) str_r.replace(",",razd);
             if (length_m!=(-1)) {
                 if (str_r.length()>length_m) {
@@ -860,7 +890,9 @@ QString MainWindow::pars_template(QString file_name,
             }
             file_shab.replace(reg_exp.cap(0),str_r);
         } else {
-            file_shab.replace(reg_exp.cap(0),plugin_search->result_tags(reg_exp.cap(0)));
+            QString str_r = plugin_search->result_tags(reg_exp.cap(0));
+            if (str_r.isEmpty()) str_r = plugin_movie->result_tags(reg_exp.cap(0));
+            file_shab.replace(reg_exp.cap(0),str_r);
         }
         pos_r = reg_exp.indexIn(file_shab,0);
     }
@@ -869,7 +901,9 @@ QString MainWindow::pars_template(QString file_name,
     FSetExtFile = FextFile;
     FSetCodec = Fcodec;
     FSetPathSave = FpathSave;
+    FSetNameFileCover = FnameFileCover;
     FSetSaveTo = FsaveTo;
+    FSetSaveCover = FsaveCover;
     return file_shab;
 }
 
@@ -878,23 +912,47 @@ void MainWindow::on_pushButton_savefile_clicked() {
     if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0)) {
         label_icon->setText("<img src="":icons/new/information-button.png"" />");
 
-        int i = (-1);
-        for (int j = 0; j < film_item.length(); j++) {
+        FCountMovie = (-1);
 
-            if ((treeWidget_search_result->currentItem() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent() == film_item[j])/* ||
-                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])*/) {
-                i = j;
+        for (int i = 0; i < film_item.length(); i++) {
+            if ((treeWidget_search_result->currentItem() == film_item[i]) ||
+                (treeWidget_search_result->currentItem() == desc_item[i]) ||
+                (treeWidget_search_result->currentItem() == image_item[i])) {
+                FCountMovie = i;
                 break;
             }
         }
 
-        if (i==(-1)) {
+        if (FCountMovie == (-1)) {
+            for (int i = 0; i < film_item.length(); i++) {
+                if (treeWidget_search_result->currentItem()->parent() == image_item[i]) {
+                    FCountMovie = i;
+                    break;
+                }
+            }
+        }
+
+        if (FCountMovie == (-1)) {
             return;
         }
 
-        FparsCommand = 1;
-        plugin_search->result_pars_movie(i,Fdir_tmp);
+        FimageDownload.clear();
+        FimageDownloadDone.clear();
+        for (int i=0; i < image_item[FCountMovie]->childCount(); i++) {
+            if (image_item[FCountMovie]->child(i)->checkState(0)==Qt::Checked) {
+                if (QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(image_item[FCountMovie]->child(i)->text(0)))).exists()) {
+                    FimageDownloadDone << image_item[FCountMovie]->child(i)->text(0);
+                } else {
+                    plugin_search->download_image(image_item[FCountMovie]->child(i)->text(0).toInt(),Fdir_tmp);
+                    FimageDownload << image_item[FCountMovie]->child(i)->text(0);
+                }
+            }
+        }
+
+        if (FimageDownload.isEmpty()) {
+            FparsCommand = 1;
+            plugin_search->result_pars_movie(FCountMovie,Fdir_tmp);
+        }
     }
 }
 
@@ -902,22 +960,32 @@ void MainWindow::on_pushButton_savebuffer_clicked() {
     if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0)) {
         label_icon->setText("<img src="":icons/new/information-button.png"" />");
 
-        int i = (-1);
-        for (int j = 0; j < film_item.length(); j++) {
-            if ((treeWidget_search_result->currentItem() == film_item[j]) ||
-                (treeWidget_search_result->currentItem()->parent() == film_item[j])/* ||
-                (treeWidget_search_result->currentItem()->parent()->parent() == film_item[j])*/) {
-                i = j;
+        int count_movie = (-1);
+
+        for (int i = 0; i < film_item.length(); i++) {
+            if ((treeWidget_search_result->currentItem() == film_item[i]) ||
+                (treeWidget_search_result->currentItem() == desc_item[i]) ||
+                (treeWidget_search_result->currentItem() == image_item[i])) {
+                count_movie = i;
                 break;
             }
         }
 
-        if (i==(-1)) {
+        if (count_movie == (-1)) {
+            for (int i = 0; i < film_item.length(); i++) {
+                if (treeWidget_search_result->currentItem()->parent() == image_item[i]) {
+                    count_movie = i;
+                    break;
+                }
+            }
+        }
+
+        if (count_movie == (-1)) {
             return;
         }
 
         FparsCommand = 2;
-        plugin_search->result_pars_movie(i,Fdir_tmp);
+        plugin_search->result_pars_movie(count_movie,Fdir_tmp);
     }
 }
 
@@ -936,8 +1004,10 @@ void MainWindow::save_description(bool saveBuf) {
                     QString FextFile = "";
                     QString Fcodec = "";
                     QString FpathSave = "";
+                    QString FnameFileCover = "";
                     int FsaveTo = (-1);
-                    text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
+                    int FsaveCover = (-1);
+                    text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                     clipboard->setText(text_otb);
                 }
@@ -992,8 +1062,10 @@ void MainWindow::save_description(bool saveBuf) {
                     QString FextFile = "";
                     QString Fcodec = "";
                     QString FpathSave = "";
+                    QString FnameFileCover = "";
                     int FsaveTo = (-1);
-                    text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FsaveTo);
+                    int FsaveCover = (-1);
+                    text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                     if (checkBox_save_templates->isChecked()) {
                         if (FpathSave.isEmpty()) {
@@ -1136,10 +1208,86 @@ void MainWindow::save_description(bool saveBuf) {
                         }
                         file.close();
                     }
+
+                    if (FsaveCover == 0) {
+                        //save_cover(FnameFileCover);
+
+                        if (FnameFileCover.isEmpty()) FnameFileCover = "result.jpg";
+                        QRegExp regexp("[\\/:*?\"<>|]");
+                        FnameFileCover.replace(regexp,"");
+
+                        if (!FimageDownloadDone.isEmpty()) {
+                            for (int i = 0; i < FimageDownloadDone.count();i++) {
+                                FAllSaveName = QDir::toNativeSeparators(FpathSave+"/"+FnameFileCover);
+                                file.setFileName(FAllSaveName);
+
+                                if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
+                                    if (resave==0) {
+                                        QMessageBox msgBox;
+                                        msgBox.setText(tr("The file already exists."));
+                                        msgBox.setInformativeText(tr("Rewrite?")+"\n"+FAllSaveName);
+                                        msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::Yes | QMessageBox::NoToAll | QMessageBox::No);
+                                        msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
+                                        msgBox.setButtonText(QMessageBox::No,tr("No"));
+                                        msgBox.setButtonText(QMessageBox::YesToAll,tr("Yes to all"));
+                                        msgBox.setButtonText(QMessageBox::NoToAll,tr("No to all"));
+                                        msgBox.setDefaultButton(QMessageBox::Ok);
+
+                                        QString ext = QFileInfo(FAllSaveName).suffix();
+                                        switch (msgBox.exec()) {
+                                            case QMessageBox::Yes: break;
+
+                                            case QMessageBox::YesToAll:
+                                                resave = 1;
+                                                break;
+
+                                            case QMessageBox::NoToAll:
+                                                resave = 2;
+
+                                                FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                                for (int i=1;;i++) {
+                                                    if (!file.exists(FAllSaveName+QString("(%1).").arg(i)+ext)) {
+                                                        file.setFileName(FAllSaveName+QString("(%1).").arg(i)+ext);
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+
+                                            default:
+                                                FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                                for (int j=1;;j++) {
+                                                    if (!file.exists(FAllSaveName+QString("(%1).").arg(j)+ext)) {
+                                                        file.setFileName(FAllSaveName+QString("(%1).").arg(j)+ext);
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    } else {
+                                        if (resave==2) {
+                                            QString ext = QFileInfo(FAllSaveName).suffix();
+                                            FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
+                                            for (int j=1;;j++) {
+                                                if (!file.exists(FAllSaveName+QString("(%1).").arg(j)+ext)) {
+                                                    file.setFileName(FAllSaveName+QString("(%1).").arg(j)+ext);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                file.remove(file.fileName());
+                                file.copy(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(FimageDownloadDone[i])),file.fileName());
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
+    FimageDownload.clear();
+    FimageDownloadDone.clear();
 
     label_icon->setText("<img src="":icons/new/tick-button.png"" />");
     label_icon->setToolTip("");
