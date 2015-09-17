@@ -61,7 +61,7 @@ PreviewCover::PreviewCover(QList<int> id_files, QList<int> check, QString dir_tm
 
     view_image(FcurrentImage);
 
-    connect(list_image_sm,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(itemDoubleClicked(QListWidgetItem*)));
+    connect(list_image_sm,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(itemClicked(QListWidgetItem*)));
 }
 
 PreviewCover::~PreviewCover()
@@ -181,7 +181,7 @@ void PreviewCover::on_pushButton_zoom_in_clicked() {
     }
 }
 
-void PreviewCover::itemDoubleClicked(QListWidgetItem *ret) {
+void PreviewCover::itemClicked(QListWidgetItem *ret) {
     FcurrentImage = ret->text().toInt();
     view_image(FcurrentImage);
 }

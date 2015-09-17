@@ -34,7 +34,7 @@ private slots:
     void on_pushButton_zoom_in_clicked();
     void on_pushButton_zoom_out_clicked();
     void on_pushButton_savefile_clicked();
-    void itemDoubleClicked(QListWidgetItem* ret);
+    void itemClicked(QListWidgetItem* ret);
 
 signals:
     void check_stat(QList<int> check);

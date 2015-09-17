@@ -322,6 +322,17 @@ void MainWindow::slotPars(int ii,QString err) {
                 desc_item[i]->setIcon(0,QIcon(":icons/sticky-note-text.png"));
             }
             if (ii == 0) {
+                if (treeWidget_templates->topLevelItemCount() == 0) {
+                    QMessageBox msgBox;
+                    msgBox.setText(tr("Not search a template!"));
+                    msgBox.setStandardButtons(QMessageBox::Ok);
+                    msgBox.setButtonText(QMessageBox::Ok,tr("Ok"));
+                    msgBox.setDefaultButton(QMessageBox::Ok);
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                    return;
+                }
+
                 QList<QString> templ;
                 int j = (-1);
                 for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
@@ -332,7 +343,9 @@ void MainWindow::slotPars(int ii,QString err) {
                         }
                     }
                 }
+
                 if (j==(-1)) j = 0;
+
                 QString text_otb = "";
                 QString FnameFile = "";
                 QString FextFile = "";
@@ -342,8 +355,9 @@ void MainWindow::slotPars(int ii,QString err) {
                 int FsaveTo = (-1);
                 int FsaveCover = (-1);
 
-                if (j==0) text_otb = defaul_templ();
-                else text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
+                //if (j==0) text_otb = defaul_templ();
+                /*else */
+                text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                 Previewdesc *prev = new Previewdesc(text_otb,"",templ,j);
                 prev->setAttribute(Qt::WA_DeleteOnClose);
@@ -422,8 +436,9 @@ QString MainWindow::template_change(QString templ) {
     QString FnameFileCover = "";
     int FsaveTo = (-1);
     int FsaveCover = (-1);
-    if (templ=="default") text_otb = defaul_templ();
-    else text_otb = pars_template(Fdir_templates+"/"+templ,FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
+    //if (templ=="default") text_otb = defaul_templ();
+    /*else */
+    text_otb = pars_template(Fdir_templates+"/"+templ,FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
     return text_otb;
 }
@@ -485,6 +500,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
     form_pr_image->setAttribute(Qt::WA_DeleteOnClose);
     form_pr_image->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     connect(form_pr_image,SIGNAL(download_image(int)),this,SLOT(slot_form_download_image(int)));
+    connect(form_pr_image,SIGNAL(check_stat(QList<int>)),this,SLOT(check_stat(QList<int>)));
     plugin_search->download_image(ret->text(0).toInt(),Fdir_tmp);
     form_pr_image->show();
     //form_pr_image = NULL;
@@ -536,6 +552,7 @@ void MainWindow::expanded(bool ex) {
     }
 }
 
+/*
 QString MainWindow::defaul_templ() {
     QString ret = "";
     for (int i = 0; i < Ftags_plug.count(); i++) {
@@ -543,6 +560,7 @@ QString MainWindow::defaul_templ() {
     }
     return ret;
 }
+*/
 
 void MainWindow::on_pushButton_about_clicked() {
     AboutDialog *ab;
@@ -602,7 +620,7 @@ void MainWindow::read_settings() {
     QStringList name_filters;
     name_filters << "*.txt";
     QStringList fileNames = dir.entryList(name_filters,QDir::Files);
-    create_item_tree_templ("default",false);
+    //create_item_tree_templ("default",false);
     for (int i = 0; i < fileNames.count(); i++) create_item_tree_templ(fileNames[i],false);
     size = settings.beginReadArray("template");
     for (int i=0;i<size;i++) {
@@ -990,15 +1008,26 @@ void MainWindow::on_pushButton_savebuffer_clicked() {
 }
 
 void MainWindow::save_description(bool saveBuf) {
+    if (treeWidget_templates->topLevelItemCount() == 0) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Not search a template!"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok,tr("Ok"));
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        return;
+    }
+
     int resave = 0;
 
     if (saveBuf) {
         for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
             if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {
                 QClipboard *clipboard = QApplication::clipboard();
-                if (i == 0) {
+                /*if (i == 0) {
                     clipboard->setText(defaul_templ());
-                } else {
+                } else {*/
                     QString text_otb = "";
                     QString FnameFile = "";
                     QString FextFile = "";
@@ -1010,14 +1039,14 @@ void MainWindow::save_description(bool saveBuf) {
                     text_otb = pars_template(Fdir_templates+"/"+treeWidget_templates->topLevelItem(i)->text(0),FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                     clipboard->setText(text_otb);
-                }
+                //}
                 break;
             }
         }
     } else {
         for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
             if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {
-                if (i == 0) { //default
+                /*if (i == 0) { //default
                     QFile file(QDir::toNativeSeparators(Fdir_result+"/result.txt"));
 
                     if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
@@ -1056,7 +1085,7 @@ void MainWindow::save_description(bool saveBuf) {
                     file.open(QIODevice::WriteOnly);
                     file.write(defaul_templ().toUtf8());
                     file.close();
-                } else {
+                } else {*/
                     QString text_otb = "";
                     QString FnameFile = "";
                     QString FextFile = "";
@@ -1234,6 +1263,10 @@ void MainWindow::save_description(bool saveBuf) {
                                         msgBox.setDefaultButton(QMessageBox::Ok);
 
                                         QString ext = QFileInfo(FAllSaveName).suffix();
+                                        if (ext.isEmpty()) {
+                                            FAllSaveName += ".jpg";
+                                            ext = QFileInfo(FAllSaveName).suffix();
+                                        }
                                         switch (msgBox.exec()) {
                                             case QMessageBox::Yes: break;
 
@@ -1266,6 +1299,10 @@ void MainWindow::save_description(bool saveBuf) {
                                     } else {
                                         if (resave==2) {
                                             QString ext = QFileInfo(FAllSaveName).suffix();
+                                            if (ext.isEmpty()) {
+                                                FAllSaveName += ".jpg";
+                                                ext = QFileInfo(FAllSaveName).suffix();
+                                            }
                                             FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
                                             for (int j=1;;j++) {
                                                 if (!file.exists(FAllSaveName+QString("(%1).").arg(j)+ext)) {
@@ -1281,7 +1318,7 @@ void MainWindow::save_description(bool saveBuf) {
                             }
                         }
                     }
-                }
+                //}
             }
         }
     }
@@ -1302,10 +1339,9 @@ void MainWindow::on_pushButton_edit_templates_clicked() {
     for (int i=0;i<treeWidget_templates->topLevelItemCount();i++)
         if (treeWidget_templates->topLevelItem(i)==treeWidget_templates->currentItem()) {
             Edit_Templates *ab;
-            if (i == 0) ab = new Edit_Templates(Fdir_templates,"",Ftags_global,Ftags_plug,Ftags_mediafile,this);
-            else ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_global,Ftags_plug,Ftags_mediafile,this);
+            ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_global,Ftags_plug,Ftags_mediafile,this);
             ab->setAttribute(Qt::WA_DeleteOnClose);
-            ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+            ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
             ab->setWindowModality(Qt::ApplicationModal);
             ab->show();
             connect(ab,SIGNAL(destroyed(QObject*)),this,SLOT(search_templates()));
@@ -1372,5 +1408,14 @@ void MainWindow::on_pushButton_movie_obzor_clicked() {
             pushButton_movie_obzor->setToolTip("");
             pushButton_movie_obzor->setIcon(QIcon(":icons/inbox-film.png"));
         }
+    }
+}
+
+void MainWindow::check_stat(QList<int> check) {
+    for (int i=0;i<treeWidget_search_result->currentItem()->parent()->childCount();i++) {
+        if (check[i]==0)
+            treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,Qt::Checked);
+        else
+            treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,Qt::Unchecked);
     }
 }

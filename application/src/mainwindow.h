@@ -104,7 +104,7 @@ private:
     bool load_plugin_movie(QString);
 
     void expanded(bool);
-    QString defaul_templ();
+    //QString defaul_templ();
 
     void read_settings();
     void write_settings();
@@ -134,6 +134,8 @@ private slots:
     void translation(QString);
 
     QString template_change(QString);
+
+    void check_stat(QList<int> check);
 
     void slot_form_download_image(int id);
 
