@@ -180,29 +180,32 @@ void PluginSearchKP::fin_d(result_url ret_code) {
             break;
         }
         case 2: {
-            if (ret_code.code_r!=0) {
-                QList<QString> ss;
-                ss.append(QString(tr("small image not search, code url - %1")).arg(ret_code.code_r));
-                ss.append(ret_code.error_string);
-                emit m_Notifyer->signalSmallImage(1,ss);
-            }
-            else {
-                QRegExp rr ("film/([^\\D]\\d+)+\\D");
-                if (rr.indexIn(ret_code.url,0)!=(-1)) {
-                    QFile file(QDir::toNativeSeparators(QString("%1/%2.sm").arg(Fdir_temp).arg(rr.cap(1))));
+            QRegExp rr ("film/([^\\D]\\d+)+\\D");
+            if (rr.indexIn(ret_code.url,0)!=(-1)) {
+                QFile file(QDir::toNativeSeparators(QString("%1/%2.sm").arg(Fdir_temp).arg(rr.cap(1))));
+                QByteArray bb;
+                if (ret_code.code_r != 0) {
+                    if (!file.exists(file.fileName())) {
+                        file.open(QIODevice::WriteOnly);
+                        file.close();
+                    }
+                } else {
                     if (!file.exists(file.fileName())) {
                         file.open(QIODevice::WriteOnly);
                         file.write(ret_code.buf_d);
                         file.close();
                     }
-                    pars_small_image(rr.cap(1),ret_code.buf_d);
+                    bb.append(ret_code.buf_d);
                 }
-                else {
-                    QList<QString> ss;
-                    ss.append(QString(tr("small image not search, not regexp")));
-                    emit m_Notifyer->signalSmallImage(1,ss);
-                }
+
+                pars_small_image(rr.cap(1),bb);
             }
+            else {
+                QList<QString> ss;
+                ss.append(QString(tr("small image not search, not regexp")));
+                emit m_Notifyer->signalSmallImage(1,ss);
+            }
+
             break;
         }
         case 3: {
@@ -262,6 +265,10 @@ void PluginSearchKP::fin_d(result_url ret_code) {
                         file.write(ret_code.buf_d);
                         file.close();
                     }
+                    QPixmap pixmap;
+                    pixmap.loadFromData(ret_code.buf_d);
+                    pixmap = pixmap.scaledToWidth(default_width_sm_image,Qt::SmoothTransformation);
+                    pixmap.save(QDir::toNativeSeparators(QString("%1/sm_main_%2.jpg").arg(Fdir_temp).arg(rr.cap(1))));
                     emit m_Notifyer->signalDownloadImage(QString("main_%1").arg(rr.cap(1)),0);
                 }
             }
@@ -829,10 +836,7 @@ void PluginSearchKP::pars_small_image(QString code_film, QByteArray buf) {
     if (!b) FlistSmallImageFull.append(tmp_sm);
 
     if (!QFile(tmp_sm.path_image).exists()) {
-        //Fnum_com = 3;
-        http_download *hd_search = new http_download(this,tmp_sm.url,3,Fproxy,Fhost,Fport,Fusername,Fpassword);
-        connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
-        hd_search->_download();
+        download_image("main",Fdir_temp);
     }
     res_sm.append(QString("%1").arg(tmp_sm.id));
 
