@@ -17,19 +17,19 @@ class PreviewCover : public QDialog, public Ui::Form_preview_cover
 {
     Q_OBJECT
 public:
-        PreviewCover(QList<int> id_files, QList<int> check, QString dir_tmp, int id_clicked=0, QWidget *parent = 0);
+        PreviewCover(QList<QString> id_files, QList<int> check, QString dir_tmp, QString id_clicked=0, QWidget *parent = 0);
         ~PreviewCover();
 
-        void DownloadComplete(int);
+        void DownloadComplete(QString);
 protected:
         void wheelEvent(QWheelEvent *event);
 private:
-        QList<int> Fid_files;
+        QList<QString> Fid_files;
         QList<int> Fcheck;
         QString Fdir_tmp;
         qreal scale;
-        int FcurrentImage;
-        void view_image(int id_filename = 0);
+        QString FcurrentImage;
+        void view_image(QString id_filename = 0);
 private slots:
     void on_pushButton_zoom_in_clicked();
     void on_pushButton_zoom_out_clicked();
@@ -38,7 +38,7 @@ private slots:
 
 signals:
     void check_stat(QList<int> check);
-    void download_image(int id);
+    void download_image(QString id);
 };
 
 #endif // PREVIEWCOVER_H

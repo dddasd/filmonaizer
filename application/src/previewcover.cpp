@@ -1,6 +1,6 @@
 #include "previewcover.h"
 
-PreviewCover::PreviewCover(QList<int> id_files, QList<int> check, QString dir_tmp, int id_clicked, QWidget *parent) : QDialog(parent) {
+PreviewCover::PreviewCover(QList<QString> id_files, QList<int> check, QString dir_tmp, QString id_clicked, QWidget *parent) : QDialog(parent) {
     setupUi(this);
     setModal(true);
 
@@ -47,6 +47,7 @@ PreviewCover::PreviewCover(QList<int> id_files, QList<int> check, QString dir_tm
         else
             newAC->setCheckState(Qt::Unchecked);
         newAC->setText(QString("%1").arg(Fid_files[i]));
+        //newAC->setSizeHint(QSize((list_image_sm->width()),((list_image_sm->height()))));
         list_image_sm->addItem(newAC);
         if (FcurrentImage == Fid_files[i]) list_image_sm->setCurrentItem(newAC,QItemSelectionModel::SelectCurrent);
     }
@@ -71,6 +72,7 @@ PreviewCover::~PreviewCover()
             Fcheck[i] = 0;
         else
             Fcheck[i] = 1;
+        qDebug() << list_image_sm->item(i)->sizeHint();
     }
     emit check_stat(Fcheck);
 }
@@ -87,7 +89,7 @@ void PreviewCover::on_pushButton_savefile_clicked()
     }
 }
 
-void PreviewCover::view_image(int id_filename)
+void PreviewCover::view_image(QString id_filename)
 {
     if (id_filename == 0) {
         label_resolution->setText("");//tr("Preview cover"));
@@ -182,7 +184,7 @@ void PreviewCover::on_pushButton_zoom_in_clicked() {
 }
 
 void PreviewCover::itemClicked(QListWidgetItem *ret) {
-    FcurrentImage = ret->text().toInt();
+    FcurrentImage = ret->text();
     view_image(FcurrentImage);
 }
 
@@ -218,6 +220,6 @@ void PreviewCover::wheelEvent(QWheelEvent *event) {
     event->accept();
 }
 
-void PreviewCover::DownloadComplete(int id) {
+void PreviewCover::DownloadComplete(QString id) {
     if (id == FcurrentImage) view_image(FcurrentImage);
 }

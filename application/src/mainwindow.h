@@ -53,6 +53,7 @@ private:
     QTranslator trans;
 
     PreviewCover *form_pr_image;
+    bool bool_fr_pr_image;
 /*\Forms*/
 
 /*Plugins*/
@@ -121,7 +122,7 @@ private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
     void slotSmallImage(int,QList<QString>);
-    void slotDownloadImage(int,int);
+    void slotDownloadImage(QString,int);
 
     void setItemIcon(int);
 
@@ -137,7 +138,8 @@ private slots:
 
     void check_stat(QList<int> check);
 
-    void slot_form_download_image(int id);
+    void slot_form_download_image(QString id);
+    void slot_form_close();
 
     void on_pushButton_search_clicked();
     void on_pushButton_savefile_clicked();

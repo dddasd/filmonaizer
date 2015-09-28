@@ -3,7 +3,8 @@
 MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     setupUi(this);
 
-    Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}" << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}";
+    Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}"
+                 << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}";
 
     if (!p) {
         Fdir_settings = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer");
@@ -167,6 +168,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     FparsCommand = (-1);
 
     FimageDownload.clear();
+    bool_fr_pr_image = false;
 }
 
 MainWindow::~MainWindow() {    
@@ -276,7 +278,7 @@ bool MainWindow::load_plugin_search(QString fileName) {
             connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
             connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
             connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
-            connect(ttt,SIGNAL(signalDownloadImage(int,int)),this,SLOT(slotDownloadImage(int,int)));
+            connect(ttt,SIGNAL(signalDownloadImage(QString,int)),this,SLOT(slotDownloadImage(QString,int)));
             Ftags_plug.clear();
             Ftags_plug = plugin_search->listTags();
             qDebug() << Ftags_plug;
@@ -412,8 +414,8 @@ void MainWindow::slotSmallImage(int err, QList<QString> list) {
     FsmallImageClick = (-1);
 }
 
-void MainWindow::slotDownloadImage(int id,int err) {
-    if (form_pr_image != NULL) {
+void MainWindow::slotDownloadImage(QString id,int err) {
+    if (bool_fr_pr_image) {
         form_pr_image->DownloadComplete(id);
     }
     if (!FimageDownload.isEmpty()) {
@@ -478,6 +480,7 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
         }
     for (int i=0;i<image_item.length();i++)
         if (ret==image_item[i]) {
+            if (ret->childCount() > 0) return;
             FsmallImageClick = i;
             icon_ch = ret;
             movie->start();
@@ -485,24 +488,26 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
             return;
         }
 
-    QList<int> id_files;
+    QList<QString> id_files;
     QList<int> check_files;
 
     for (int i=0;i<ret->parent()->childCount();i++) {
-        id_files << ret->parent()->child(i)->text(0).toInt();
+        id_files << ret->parent()->child(i)->text(0);
         if (ret->parent()->child(i)->checkState(0)==Qt::Checked)
             check_files << 0;
         else
             check_files << 1;
     }
 
-    form_pr_image = new PreviewCover(id_files,check_files,Fdir_tmp,ret->text(0).toInt(),this);
+    form_pr_image = new PreviewCover(id_files,check_files,Fdir_tmp,ret->text(0),this);
     form_pr_image->setAttribute(Qt::WA_DeleteOnClose);
     form_pr_image->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
-    connect(form_pr_image,SIGNAL(download_image(int)),this,SLOT(slot_form_download_image(int)));
+    connect(form_pr_image,SIGNAL(download_image(QString)),this,SLOT(slot_form_download_image(QString)));
     connect(form_pr_image,SIGNAL(check_stat(QList<int>)),this,SLOT(check_stat(QList<int>)));
-    plugin_search->download_image(ret->text(0).toInt(),Fdir_tmp);
+    connect(form_pr_image,SIGNAL(finished(int)),this,SLOT(slot_form_close()));
+    plugin_search->download_image(ret->text(0),Fdir_tmp);
     form_pr_image->show();
+    bool_fr_pr_image = true;
     //form_pr_image = NULL;
 }
 
@@ -961,7 +966,7 @@ void MainWindow::on_pushButton_savefile_clicked() {
                 if (QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_tmp).arg(image_item[FCountMovie]->child(i)->text(0)))).exists()) {
                     FimageDownloadDone << image_item[FCountMovie]->child(i)->text(0);
                 } else {
-                    plugin_search->download_image(image_item[FCountMovie]->child(i)->text(0).toInt(),Fdir_tmp);
+                    plugin_search->download_image(image_item[FCountMovie]->child(i)->text(0),Fdir_tmp);
                     FimageDownload << image_item[FCountMovie]->child(i)->text(0);
                 }
             }
@@ -1248,6 +1253,11 @@ void MainWindow::save_description(bool saveBuf) {
                         if (!FimageDownloadDone.isEmpty()) {
                             for (int i = 0; i < FimageDownloadDone.count();i++) {
                                 FAllSaveName = QDir::toNativeSeparators(FpathSave+"/"+FnameFileCover);
+                                QString ext = QFileInfo(FAllSaveName).suffix();
+                                if (ext != ".jpg") {
+                                    FAllSaveName += ".jpg";
+                                    ext = QFileInfo(FAllSaveName).suffix();
+                                }
                                 file.setFileName(FAllSaveName);
 
                                 if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
@@ -1262,11 +1272,6 @@ void MainWindow::save_description(bool saveBuf) {
                                         msgBox.setButtonText(QMessageBox::NoToAll,tr("No to all"));
                                         msgBox.setDefaultButton(QMessageBox::Ok);
 
-                                        QString ext = QFileInfo(FAllSaveName).suffix();
-                                        if (ext.isEmpty()) {
-                                            FAllSaveName += ".jpg";
-                                            ext = QFileInfo(FAllSaveName).suffix();
-                                        }
                                         switch (msgBox.exec()) {
                                             case QMessageBox::Yes: break;
 
@@ -1298,11 +1303,6 @@ void MainWindow::save_description(bool saveBuf) {
                                         }
                                     } else {
                                         if (resave==2) {
-                                            QString ext = QFileInfo(FAllSaveName).suffix();
-                                            if (ext.isEmpty()) {
-                                                FAllSaveName += ".jpg";
-                                                ext = QFileInfo(FAllSaveName).suffix();
-                                            }
                                             FAllSaveName.remove(FAllSaveName.length()-ext.length()-1,ext.length()+1);
                                             for (int j=1;;j++) {
                                                 if (!file.exists(FAllSaveName+QString("(%1).").arg(j)+ext)) {
@@ -1330,7 +1330,7 @@ void MainWindow::save_description(bool saveBuf) {
     label_icon->setToolTip("");
 }
 
-void MainWindow::slot_form_download_image(int id) {
+void MainWindow::slot_form_download_image(QString id) {
     plugin_search->download_image(id,Fdir_tmp);
 }
 
@@ -1418,4 +1418,8 @@ void MainWindow::check_stat(QList<int> check) {
         else
             treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,Qt::Unchecked);
     }
+}
+
+void MainWindow::slot_form_close() {
+    bool_fr_pr_image = false;
 }

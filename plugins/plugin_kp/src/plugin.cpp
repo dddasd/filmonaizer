@@ -72,7 +72,7 @@ void PluginSearchKP::result_search_movie(QString str) {
 void PluginSearchKP::result_pars_movie(int index, QString dir_tmp) {
     if ((index >= 0) && (index < res_search.count())) {
         Fdir_temp = dir_tmp;
-        QFile file(Fdir_temp+QDir::separator()+res_search[index].url_f+".ops");
+        QFile file(QDir::toNativeSeparators(QString("%1/%2.ops").arg(Fdir_temp).arg(res_search[index].url_f)));
         if (!file.exists(file.fileName())) {
             //Fnum_com = 1;
             http_download *hd_search = new http_download(this,"http://www.kinopoisk.ru/film/"+res_search[index].url_f+"/",1,Fproxy,Fhost,Fport,Fusername,Fpassword);
@@ -89,9 +89,9 @@ void PluginSearchKP::result_pars_movie(int index, QString dir_tmp) {
 
 void PluginSearchKP::result_search_small_image(int index, QString dir_tmp) {
     if ((index >= 0) && (index < res_search.count())) {
-        FlistSmallImageFull.clear();
+        //FlistSmallImageFull.clear();
         Fdir_temp = dir_tmp;
-        QFile file(Fdir_temp+QDir::separator()+res_search[index].url_f+".sm");
+        QFile file(QDir::toNativeSeparators(QString("%1/%2.sm").arg(Fdir_temp).arg(res_search[index].url_f)));
         if (!file.exists(file.fileName())) {
             //Fnum_com = 2;
             http_download *hd_search = new http_download(this,"http://www.kinopoisk.ru/film/"+res_search[index].url_f+"/covers/",2,Fproxy,Fhost,Fport,Fusername,Fpassword);
@@ -100,7 +100,7 @@ void PluginSearchKP::result_search_small_image(int index, QString dir_tmp) {
 
         } else {
             file.open(QIODevice::ReadOnly);
-            pars_small_image(file.readAll());
+            pars_small_image(res_search[index].url_f,file.readAll());
             file.close();
         }
     }
@@ -164,7 +164,7 @@ void PluginSearchKP::fin_d(result_url ret_code) {
             else {
                 QRegExp rr ("film/([^\\D]\\d+)+\\D");
                 if (rr.indexIn(ret_code.url,0)!=(-1)) {
-                    QFile file(Fdir_temp+QDir::separator()+rr.cap(1)+".ops");
+                    QFile file(QDir::toNativeSeparators(QString("%1/%2.ops").arg(Fdir_temp).arg(rr.cap(1))));
                     if (!file.exists(file.fileName())) {
                         file.open(QIODevice::WriteOnly);
                         file.write(ret_code.buf_d);
@@ -189,13 +189,13 @@ void PluginSearchKP::fin_d(result_url ret_code) {
             else {
                 QRegExp rr ("film/([^\\D]\\d+)+\\D");
                 if (rr.indexIn(ret_code.url,0)!=(-1)) {
-                    QFile file(Fdir_temp+QDir::separator()+rr.cap(1)+".sm");
+                    QFile file(QDir::toNativeSeparators(QString("%1/%2.sm").arg(Fdir_temp).arg(rr.cap(1))));
                     if (!file.exists(file.fileName())) {
                         file.open(QIODevice::WriteOnly);
                         file.write(ret_code.buf_d);
                         file.close();
                     }
-                    pars_small_image(ret_code.buf_d);
+                    pars_small_image(rr.cap(1),ret_code.buf_d);
                 }
                 else {
                     QList<QString> ss;
@@ -212,10 +212,10 @@ void PluginSearchKP::fin_d(result_url ret_code) {
             else {
                 for (int i = 0; i < FlistSmallImageFull.count(); i++) {
                     if (FlistSmallImageFull[i].url == ret_code.url) {
-                        QFile file(FlistSmallImageFull[i].path_image);
-                        file.open(QIODevice::WriteOnly);
-                        file.write(ret_code.buf_d);
-                        file.close();
+                        QPixmap pixmap;
+                        pixmap.loadFromData(ret_code.buf_d);
+                        pixmap = pixmap.scaledToWidth(default_width_sm_image,Qt::SmoothTransformation);
+                        pixmap.save(FlistSmallImageFull[i].path_image);
                         break;
                     }
                 }
@@ -238,13 +238,31 @@ void PluginSearchKP::fin_d(result_url ret_code) {
             else {
                 QRegExp rr ("(\\d+).jpg");
                 if (rr.indexIn(ret_code.url,0)!=(-1)) {
-                    QFile file(Fdir_temp+QDir::separator()+rr.cap(1)+".jpg");
+                    QFile file(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(rr.cap(1))));
                     if (!file.exists(file.fileName())) {
                         file.open(QIODevice::WriteOnly);
                         file.write(ret_code.buf_d);
                         file.close();
                     }
-                    emit m_Notifyer->signalDownloadImage(rr.cap(1).toInt(),0);
+                    emit m_Notifyer->signalDownloadImage(rr.cap(1),0);
+                }
+            }
+            break;
+        }
+        case 6: {
+            if (ret_code.code_r!=0) {
+                //emit m_Notifyer->signalPars(1,ret_code.error_string);
+            }
+            else {
+                QRegExp rr ("(\\d+).jpg");
+                if (rr.indexIn(ret_code.url,0)!=(-1)) {
+                    QFile file(QDir::toNativeSeparators(QString("%1/main_%2.jpg").arg(Fdir_temp).arg(rr.cap(1))));
+                    if (!file.exists(file.fileName())) {
+                        file.open(QIODevice::WriteOnly);
+                        file.write(ret_code.buf_d);
+                        file.close();
+                    }
+                    emit m_Notifyer->signalDownloadImage(QString("main_%1").arg(rr.cap(1)),0);
                 }
             }
             break;
@@ -787,18 +805,43 @@ QString PluginSearchKP::result_tags(QString tt) {
     else return "";
 }
 
-void PluginSearchKP::pars_small_image(QByteArray buf) {
+void PluginSearchKP::pars_small_image(QString code_film, QByteArray buf) {
     QTextCodec *c;
     c = QTextCodec::codecForHtml(buf);
     QString buf_s(c->toUnicode(buf));
+    QList<QString> res_sm;
+
+    //картинка main:
+    //small - http://st.kp.yandex.net/images/sm_film/{code_film}.jpg
+    //full - http://st.kp.yandex.net/images/film_big/{code_film}.jpg
+
+    sm_image tmp_sm;
+    tmp_sm.id = QString("main_%1").arg(code_film);
+    tmp_sm.url = QString("http://st.kp.yandex.net/images/sm_film/%1.jpg").arg(code_film);
+    tmp_sm.path_image = QDir::toNativeSeparators(QString("%1/sm_%2.jpg").arg(Fdir_temp).arg(tmp_sm.id));
+    bool b = false;
+    for (int i = 0; i < FlistSmallImageFull.count();i++) {
+        if (FlistSmallImageFull[i].id == tmp_sm.id) {
+            b = true;
+            tmp_sm.path_image = FlistSmallImageFull[i].path_image;
+        }
+    }
+    if (!b) FlistSmallImageFull.append(tmp_sm);
+
+    if (!QFile(tmp_sm.path_image).exists()) {
+        //Fnum_com = 3;
+        http_download *hd_search = new http_download(this,tmp_sm.url,3,Fproxy,Fhost,Fport,Fusername,Fpassword);
+        connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+        hd_search->_download();
+    }
+    res_sm.append(QString("%1").arg(tmp_sm.id));
 
     QRegExp regexp("<a href=\"/picture/+([\\d]*)+/\"><img+.+\"+([^\"]*)+\"");
     regexp.setMinimal(true);
     int pos = regexp.indexIn(buf_s,0);
-    QList<QString> res_sm;
     while (pos!=(-1)) {
         sm_image tmp_sm;
-        tmp_sm.id = regexp.cap(1).toInt();
+        tmp_sm.id = regexp.cap(1);
         tmp_sm.url = regexp.cap(2);
         tmp_sm.path_image = QDir::toNativeSeparators(QString("%1/sm_%2.jpg").arg(Fdir_temp).arg(tmp_sm.id));
         bool b = false;
@@ -843,10 +886,16 @@ void PluginSearchKP::pars_image(QByteArray buf) {
     }
 }
 
-void PluginSearchKP::download_image(int id,QString dir_tmp) {
+void PluginSearchKP::download_image(QString id,QString dir_tmp) {
     Fdir_temp = dir_tmp;
     if (!QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(id))).exists()) {
-        http_download *hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
+        http_download *hd_search;
+        if (id.indexOf("main")!=(-1)) {
+            QRegExp rr("\\d+");
+            if (rr.indexIn(id)!=(-1)) {
+                hd_search = new http_download(this,QString("http://st.kp.yandex.net/images/film_big/%1.jpg").arg(rr.cap(0)),6,Fproxy,Fhost,Fport,Fusername,Fpassword);
+            } else return;
+        } else hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
         connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
         hd_search->_download();
     } else {
@@ -858,7 +907,13 @@ void PluginSearchKP::download_all_image(QString dir_tmp) {
     Fdir_temp = dir_tmp;
     for (int i = 0; i < FlistSmallImageFull.count(); i++) {
         if (!QFile(QDir::toNativeSeparators(QString("%1/%2.jpg").arg(Fdir_temp).arg(FlistSmallImageFull[i].id))).exists()) {
-            http_download *hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(FlistSmallImageFull[i].id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
+            http_download *hd_search;
+            if (FlistSmallImageFull[i].id.indexOf("main")!=(-1)) {
+                QRegExp rr("\\d+");
+                if (rr.indexIn(FlistSmallImageFull[i].id)!=(-1)) {
+                    hd_search = new http_download(this,QString("http://st.kp.yandex.net/images/film_big/%1.jpg").arg(rr.cap(0)),6,Fproxy,Fhost,Fport,Fusername,Fpassword);
+                } else return;
+            } else hd_search = new http_download(this,QString("http://www.kinopoisk.ru/picture/%1/").arg(FlistSmallImageFull[i].id),4,Fproxy,Fhost,Fport,Fusername,Fpassword);
             connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
             hd_search->_download();
         } else {

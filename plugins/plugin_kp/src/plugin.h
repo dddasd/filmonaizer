@@ -8,9 +8,12 @@
 #include <QList>
 #include <QDir>
 #include <QFile>
+#include <QPixmap>
 
 #include "qinterfacepluginsearch.h"
 #include "http_download.h"
+
+#define default_width_sm_image 170
 
 class NotifyerSearch: public INotifyerSearch {
     Q_OBJECT
@@ -21,7 +24,7 @@ signals:
     void signalSearch(QList<QString>,int,QString);
     void signalPars(int,QString);
     void signalSmallImage(int,QList<QString>);
-    void signalDownloadImage(int,int);
+    void signalDownloadImage(QString,int);
 };
 
 class PluginSearchKP: public QObject, QInterfacePluginSearch {
@@ -36,7 +39,7 @@ public:
     void result_search_movie(QString) Q_DECL_OVERRIDE; //Поиск фильма, аргумент - строка поиска
     void result_pars_movie(int,QString) Q_DECL_OVERRIDE; //Загрузка фильма, и возвращение результата в шаблоне
     void result_search_small_image(int,QString) Q_DECL_OVERRIDE; //Загрузка мелких картинок
-    void download_image(int,QString) Q_DECL_OVERRIDE; //Загрузить картинку по её ID
+    void download_image(QString,QString) Q_DECL_OVERRIDE; //Загрузить картинку по её ID
     void download_all_image(QString) Q_DECL_OVERRIDE; //Загрузить все картинки (которые были найдены в мелких)
 
     QList<QString> listTags() Q_DECL_OVERRIDE; //Список тегов
@@ -61,7 +64,7 @@ private:
     };
 
     struct sm_image {
-        int id;
+        QString id;
         QString url;
         QString path_image;
     };
@@ -97,7 +100,7 @@ private:
     QString html_decode(QString);
     void pars_film_result(QByteArray buf);
     void clear_map();
-    void pars_small_image(QByteArray buf);
+    void pars_small_image(QString code_film, QByteArray buf);
     void pars_image(QByteArray buf);
 private slots:
     void fin_d(result_url);
