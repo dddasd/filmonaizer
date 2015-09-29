@@ -10,8 +10,14 @@
 #include <QFile>
 #include <QPixmap>
 
+#include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
+
 #include "qinterfacepluginsearch.h"
-//#include "http_download.h"
+#include "http_download.h"
 
 #define default_width_sm_image 170
 #define api_key "834bec6fc86837ca086473e3c29556e9"
@@ -79,14 +85,8 @@ private:
     QString Fusername;
     QString Fpassword;
 
-    //Номер команды
-    //int Fnum_com;
-
     //Папка с темп директорией
     QString Fdir_temp;
-
-    //
-    QString Fyear_search;
 
     bool Fsearch_link;
 
@@ -96,15 +96,14 @@ private:
 
     QList<sm_image> FlistSmallImageFull;
 
-    QString chartoascii(QString);
-    void pars_search_result(QByteArray,QString);
+    void pars_search_result(QByteArray);
     QString html_decode(QString);
     void pars_film_result(QByteArray buf);
     void clear_map();
     void pars_small_image(QString code_film, QByteArray buf);
     void pars_image(QByteArray buf);
 private slots:
-    //void fin_d(result_url);
+    void fin_d(result_url);
 };
 
 #endif
