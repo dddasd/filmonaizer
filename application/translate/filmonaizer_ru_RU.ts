@@ -34,6 +34,29 @@
     </message>
 </context>
 <context>
+    <name>DialogPlugins</name>
+    <message>
+        <location filename="../src/dialog_plugins.cpp" line="4"/>
+        <source>Plugins Search</source>
+        <translation>Плагины поиска</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog_plugins.cpp" line="5"/>
+        <source>Plugins Media</source>
+        <translation>Плагины медиа</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog_plugins.cpp" line="25"/>
+        <source>Confirm changes</source>
+        <translation>Применить изменения</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog_plugins.cpp" line="27"/>
+        <source>Close Window</source>
+        <translation>Закрыть окно</translation>
+    </message>
+</context>
+<context>
     <name>Edit_Templates</name>
     <message>
         <location filename="../src/edit_templates.cpp" line="177"/>
@@ -748,6 +771,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="233"/>
+        <location filename="../src/mainwindow.ui" line="479"/>
         <source>Select a movie file</source>
         <translation>Выбор файла с фильмом</translation>
     </message>
@@ -767,22 +791,22 @@ p, li { white-space: pre-wrap; }
         <translation>Редактор шаблонов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="479"/>
+        <location filename="../src/mainwindow.ui" line="508"/>
         <source>Settings proxy</source>
         <translation>Настройки прокси</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="534"/>
+        <location filename="../src/mainwindow.ui" line="563"/>
         <source>About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="570"/>
+        <location filename="../src/mainwindow.ui" line="599"/>
         <source>Русский</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="578"/>
+        <location filename="../src/mainwindow.ui" line="607"/>
         <source>English</source>
         <translation></translation>
     </message>
