@@ -97,11 +97,9 @@ private:
     QList<sm_image> FlistSmallImageFull;
 
     void pars_search_result(QByteArray);
-    QString html_decode(QString);
     void pars_film_result(QByteArray buf);
     void clear_map();
-    void pars_small_image(QString code_film, QByteArray buf);
-    void pars_image(QByteArray buf);
+    void pars_small_image(QByteArray buf);
 private slots:
     void fin_d(result_url);
 };
