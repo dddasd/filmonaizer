@@ -164,6 +164,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     else radioButton_rewrite_question->setChecked(true);
 
     if (FSavingModeTraffic) checkBox_saving_mode_traffic->setCheckState(Qt::Checked);
+    if (Fclear_tmp_exit) checkBox_clear_tmp_folder->setCheckState(Qt::Checked);
 
     FparsCommand = (-1);
 
@@ -180,6 +181,9 @@ MainWindow::~MainWindow() {
 
     if (checkBox_saving_mode_traffic->checkState()==Qt::Checked) FSavingModeTraffic = true;
     else FSavingModeTraffic = false;
+
+    if (checkBox_clear_tmp_folder->checkState()==Qt::Checked) Fclear_tmp_exit = true;
+    else Fclear_tmp_exit = false;
 
     write_settings();
 
@@ -415,6 +419,7 @@ void MainWindow::slotSmallImage(int err, QList<QString> list) {
 }
 
 void MainWindow::slotDownloadImage(QString id,int err) {
+    Q_UNUSED(err);
     if (bool_fr_pr_image) {
         form_pr_image->DownloadComplete(id);
     }
@@ -1422,4 +1427,28 @@ void MainWindow::check_stat(QList<int> check) {
 
 void MainWindow::slot_form_close() {
     bool_fr_pr_image = false;
+}
+
+void MainWindow::on_pushButton_set_plugins_clicked() {
+    DialogPlugins *dial = new DialogPlugins(Ffilename_plugin_search,Fcurrent_plugins_search,Ffilename_plugin_movie,Fcurrent_plugins_movie,this);
+    dial->setAttribute(Qt::WA_DeleteOnClose);
+    dial->setWindowFlags(Qt::SplashScreen);
+    connect(dial,SIGNAL(save_plug(QString,QString)),this,SLOT(change_plugins(QString,QString)));
+    QPoint pos;
+    pos.setX(this->pos().x()+this->size().width());
+    pos.setY(this->pos().y()+pushButton_set_plugins->pos().y()+pushButton_set_plugins->size().height());
+    dial->move(pos);
+    dial->show();
+}
+
+void MainWindow::change_plugins(QString pl_s,QString pl_m) {
+    if (Fcurrent_plugins_search != pl_s) {
+        Fcurrent_plugins_search = pl_s;
+        load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
+    }
+
+    if (Fcurrent_plugins_movie != pl_m) {
+        Fcurrent_plugins_movie = pl_m;
+        load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
+    }
 }

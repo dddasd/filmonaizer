@@ -15,7 +15,8 @@ SOURCES += src/main.cpp \
     src/dialog_version.cpp \
     src/set_proxy.cpp \
     src/previewcover.cpp \
-    src/edit_templates.cpp
+    src/edit_templates.cpp \
+    src/dialog_plugins.cpp
 HEADERS += src/mainwindow.h \
     src/qinterfacepluginsearch.h \
     src/qinterfacepluginmovie.h \
@@ -26,7 +27,8 @@ HEADERS += src/mainwindow.h \
     src/dialog_version.h \
     src/set_proxy.h \
     src/previewcover.h \
-    src/edit_templates.h
+    src/edit_templates.h \
+    src/dialog_plugins.h
 FORMS += src/mainwindow.ui \
     src/aboutdialog.ui \
     src/set_proxy.ui \

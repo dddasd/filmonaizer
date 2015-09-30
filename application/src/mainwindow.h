@@ -26,6 +26,7 @@
 #include "set_proxy.h"
 #include "previewcover.h"
 #include "edit_templates.h"
+#include "dialog_plugins.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow_filmonaizer {
     Q_OBJECT
@@ -141,6 +142,8 @@ private slots:
     void slot_form_download_image(QString id);
     void slot_form_close();
 
+    void change_plugins(QString,QString);
+
     void on_pushButton_search_clicked();
     void on_pushButton_savefile_clicked();
     void on_pushButton_savebuffer_clicked();
@@ -149,4 +152,5 @@ private slots:
     void on_pushButton_set_proxy_clicked();
     void on_pushButton_edit_templates_clicked();
     void on_pushButton_movie_obzor_clicked();
+    void on_pushButton_set_plugins_clicked();
 };

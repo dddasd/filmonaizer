@@ -519,99 +519,101 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="41"/>
-        <location filename="../src/mainwindow.cpp" line="67"/>
+        <location filename="../src/mainwindow.cpp" line="42"/>
+        <location filename="../src/mainwindow.cpp" line="68"/>
         <source>Fatal error</source>
         <translation>Фатальная ошибка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="41"/>
-        <location filename="../src/mainwindow.cpp" line="67"/>
+        <location filename="../src/mainwindow.cpp" line="42"/>
+        <location filename="../src/mainwindow.cpp" line="68"/>
         <source>Not detected any plugins</source>
         <translation>Не найдены плагины</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="1023"/>
+        <source>Not search a template!</source>
+        <translation>Не найдены шаблоны!</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="374"/>
         <source>error slotPars - </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="378"/>
+        <location filename="../src/mainwindow.cpp" line="398"/>
         <source>error small image</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="785"/>
+        <location filename="../src/mainwindow.cpp" line="813"/>
         <source>not exists file template</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="790"/>
+        <location filename="../src/mainwindow.cpp" line="818"/>
         <source>not open file template</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1025"/>
-        <location filename="../src/mainwindow.cpp" line="1133"/>
-        <location filename="../src/mainwindow.cpp" line="1227"/>
+        <location filename="../src/mainwindow.cpp" line="1172"/>
+        <location filename="../src/mainwindow.cpp" line="1271"/>
         <source>The file already exists.</source>
         <translation>Файл уже существует.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1026"/>
-        <location filename="../src/mainwindow.cpp" line="1134"/>
-        <location filename="../src/mainwindow.cpp" line="1228"/>
+        <location filename="../src/mainwindow.cpp" line="1173"/>
+        <location filename="../src/mainwindow.cpp" line="1272"/>
         <source>Rewrite?</source>
         <translation>Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1028"/>
-        <location filename="../src/mainwindow.cpp" line="1075"/>
-        <location filename="../src/mainwindow.cpp" line="1136"/>
-        <location filename="../src/mainwindow.cpp" line="1230"/>
+        <location filename="../src/mainwindow.cpp" line="1114"/>
+        <location filename="../src/mainwindow.cpp" line="1175"/>
+        <location filename="../src/mainwindow.cpp" line="1274"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1029"/>
-        <location filename="../src/mainwindow.cpp" line="1076"/>
-        <location filename="../src/mainwindow.cpp" line="1137"/>
-        <location filename="../src/mainwindow.cpp" line="1231"/>
+        <location filename="../src/mainwindow.cpp" line="1115"/>
+        <location filename="../src/mainwindow.cpp" line="1176"/>
+        <location filename="../src/mainwindow.cpp" line="1275"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1030"/>
-        <location filename="../src/mainwindow.cpp" line="1138"/>
-        <location filename="../src/mainwindow.cpp" line="1232"/>
+        <location filename="../src/mainwindow.cpp" line="1177"/>
+        <location filename="../src/mainwindow.cpp" line="1276"/>
         <source>Yes to all</source>
         <translation>Да для всех</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1031"/>
-        <location filename="../src/mainwindow.cpp" line="1139"/>
-        <location filename="../src/mainwindow.cpp" line="1233"/>
+        <location filename="../src/mainwindow.cpp" line="1178"/>
+        <location filename="../src/mainwindow.cpp" line="1277"/>
         <source>No to all</source>
         <translation>Нет для всех</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1073"/>
+        <location filename="../src/mainwindow.cpp" line="1112"/>
         <source>In pattern no tags {;path_save}, save in folder default?</source>
         <translation>В шаблоне нет тега {;path_save}, сохранить в папку по-умолчанию?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1101"/>
-        <location filename="../src/mainwindow.cpp" line="1109"/>
+        <location filename="../src/mainwindow.cpp" line="1140"/>
+        <location filename="../src/mainwindow.cpp" line="1148"/>
         <source>Could not create the folder where you want to save the result, saving cancel.</source>
         <translation>Не удалось создать папку, куда нужно сохранить результат, сохранение прервано.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1104"/>
+        <location filename="../src/mainwindow.cpp" line="335"/>
+        <location filename="../src/mainwindow.cpp" line="1025"/>
+        <location filename="../src/mainwindow.cpp" line="1143"/>
         <source>Ok</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="516"/>
+        <location filename="../src/mainwindow.cpp" line="542"/>
         <source>Expand</source>
         <translation>Показать</translation>
     </message>
@@ -620,8 +622,8 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">kinopoisk.ru упал</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="119"/>
-        <location filename="../src/mainwindow.cpp" line="534"/>
+        <location filename="../src/mainwindow.cpp" line="120"/>
+        <location filename="../src/mainwindow.cpp" line="560"/>
         <source>Collapse</source>
         <translation>Скрыть</translation>
     </message>
@@ -630,7 +632,7 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">Отправить в Google Buzz</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="140"/>
+        <location filename="../src/mainwindow.cpp" line="141"/>
         <source>Send to Twitter</source>
         <translation>Отправить в Twitter</translation>
     </message>
@@ -639,12 +641,12 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">Отправить в  FriendFeed</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
+        <location filename="../src/mainwindow.cpp" line="145"/>
         <source>Send to Facebook</source>
         <translation>Отправить в Facebook</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="146"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>Send to VKontakte</source>
         <translation>Отправить в ВКонтакте</translation>
     </message>
@@ -653,12 +655,12 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">нет обложек для этого фильма</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="216"/>
+        <location filename="../src/mainwindow.cpp" line="222"/>
         <source>Description movie</source>
         <translation>Описание фильма</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="220"/>
+        <location filename="../src/mainwindow.cpp" line="226"/>
         <source>Covers</source>
         <translation>Обложки</translation>
     </message>
@@ -667,12 +669,12 @@ p, li { white-space: pre-wrap; }
         <translation type="vanished">Выберите директорию для сохранения результатов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1359"/>
+        <location filename="../src/mainwindow.cpp" line="1400"/>
         <source>Select a movie</source>
         <translation>Выберите фильм</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1361"/>
+        <location filename="../src/mainwindow.cpp" line="1402"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -755,27 +757,32 @@ p, li { white-space: pre-wrap; }
         <translation>Режим экономии трафика</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="430"/>
+        <location filename="../src/mainwindow.ui" line="395"/>
+        <source>Clear temp folder on exit</source>
+        <translation>Очищать директрою Temp перед выходом</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="437"/>
         <source>Edit templates</source>
         <translation>Редактор шаблонов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="472"/>
+        <location filename="../src/mainwindow.ui" line="479"/>
         <source>Settings proxy</source>
         <translation>Настройки прокси</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="527"/>
+        <location filename="../src/mainwindow.ui" line="534"/>
         <source>About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="563"/>
+        <location filename="../src/mainwindow.ui" line="570"/>
         <source>Русский</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="571"/>
+        <location filename="../src/mainwindow.ui" line="578"/>
         <source>English</source>
         <translation></translation>
     </message>
@@ -793,12 +800,12 @@ p, li { white-space: pre-wrap; }
         <translation>Нет необходимых библиотек.</translation>
     </message>
     <message>
-        <location filename="../src/previewcover.cpp" line="80"/>
+        <location filename="../src/previewcover.cpp" line="82"/>
         <source>Save a cover</source>
         <translation>Сохранить обложку</translation>
     </message>
     <message>
-        <location filename="../src/previewcover.cpp" line="82"/>
+        <location filename="../src/previewcover.cpp" line="84"/>
         <source>jpg files (*.jpg)</source>
         <translation></translation>
     </message>

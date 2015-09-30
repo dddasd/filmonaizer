@@ -389,6 +389,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_clear_tmp_folder">
+          <property name="text">
+           <string>Clear temp folder on exit</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -453,6 +460,35 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_set_plugins">
+          <property name="minimumSize">
+           <size>
+            <width>23</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>23</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Select a movie file</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../icons/filmonaizer.qrc">
+            <normaloff>:/icons/buzz.png</normaloff>:/icons/buzz.png</iconset>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_set_proxy">
