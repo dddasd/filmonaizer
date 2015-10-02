@@ -94,7 +94,8 @@ private:
     QList<QString> FimageDownload; //список картинок которые нужно скачать
     QList<QString> FimageDownloadDone; //Список скачанных картинок
 
-    int FparsCommand; // 0 - превью окно, 1 - сохранить в файл, 2 - сохранить в буфер
+    int FparsCommand; // 0 - превью окно, 1 - сохранить в файл, 2 - сохранить в буфер, 3 - открыть в ссылке
+    QString FopenUrl;
 
     int FsmallImageClick; //id - куда кликнули
 
@@ -110,6 +111,8 @@ private:
 
     void read_settings();
     void write_settings();
+
+    void create_menu_export();
 
     void search_templates();
     void save_templates();
@@ -153,4 +156,6 @@ private slots:
     void on_pushButton_edit_templates_clicked();
     void on_pushButton_movie_obzor_clicked();
     void on_pushButton_set_plugins_clicked();
+    void on_checkBox_save_templates_stateChanged(int state);
+    void on_menu_export_triggered(QAction*);
 };

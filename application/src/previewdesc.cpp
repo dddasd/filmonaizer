@@ -1,10 +1,13 @@
 #include "previewdesc.h"
 
-Previewdesc::Previewdesc(QString desc, QString link, QList<QString> templ, int current_templ, QWidget *parent)
+Previewdesc::Previewdesc(QString desc, QString link, QList<QString> templ, int current_templ, QString current_local, QWidget *parent)
     : QDialog(parent)
 {
     setupUi(this);
     setModal(true);
+
+    menu_export = new QMenu;
+    create_menu_export(current_local);
 
     link_kp = link;
 
@@ -46,62 +49,58 @@ void Previewdesc::on_pushButton_save_buffer_clicked()
     clipboard->setText(text_desc->toPlainText());
 }
 
-void Previewdesc::on_pushButton_save_twitter_clicked()
-{
-//http://twitter.com/home?status=
-    QString ss(text_desc->toPlainText());
-    if(ss.length()>140) {
-        QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Twitter"));
-        msgBox.setText(tr("Length of the tweet more than 140 characters. Trim message?"));
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Cancel);
-        msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
-        msgBox.setButtonText(QMessageBox::Cancel,tr("Cancel"));
-        msgBox.setButtonText(QMessageBox::No,tr("No"));
-        int ret = msgBox.exec();
-        switch (ret) {
-            case QMessageBox::Yes: {
-                ss.resize(140);
-                //QDesktopServices::openUrl(QUrl(QString("http://twitter.com/home?status=%1").arg(ss)));
-				QDesktopServices::openUrl(QUrl(QString("http://twitter.com/share?url=%1&via=filmonaizer&text=%2").arg(link_kp).arg(ss)));
-                break;
+void Previewdesc::on_menu_export_triggered(QAction *act) {
+    QDesktopServices::openUrl(QUrl(QString(act->data().toString()).arg(text_desc->toPlainText())));
+}
+
+void Previewdesc::create_menu_export(QString cur_local) {
+    QFile file(QDir::toNativeSeparators(QApplication::applicationDirPath()+"/sendto.list"));
+
+    if (!file.exists()) return;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+    QString icon = "",url = "",title = "";
+    while (!file.atEnd()) {
+        QString line(file.readLine());
+
+        QRegExp rr("([^:]*)+:");
+
+        if (rr.indexIn(line,0)!=(-1)) {
+            line.remove(rr.cap(0));
+            if (rr.cap(1) == "title") {
+                QRegExp rr1("([^:]*)+:+([^,]*)+,");
+                while (rr1.indexIn(line,0)!=(-1)) {
+                    if (rr1.cap(1) == cur_local) {
+                        title = rr1.cap(2);
+                        break;
+                    }
+                    line.remove(rr1.cap(0));
+                }
             }
-            case QMessageBox::No: {
-                //QDesktopServices::openUrl(QUrl(QString("http://twitter.com/home?status=%1").arg(ss)));
-				QDesktopServices::openUrl(QUrl(QString("http://twitter.com/share?url=%1&via=filmonaizer&text=%2").arg(link_kp).arg(ss)));
-                break;
+            if (rr.cap(1) == "url") {
+                if( line.endsWith("\n") ) line.truncate( line.length() - 1 );
+                url = line;
+            }
+            if (rr.cap(1) == "icon") {
+                if( line.endsWith("\n") ) line.truncate( line.length() - 1 );
+                icon = line;
             }
         }
+
+        if ((!icon.isEmpty()) && (!title.isEmpty()) && (!url.isEmpty())) {
+            QPixmap pp;
+            pp.loadFromData(QByteArray::fromBase64(icon.toUtf8()));
+            QIcon icon_(pp);
+
+            QAction *act_t = menu_export->addAction(icon_,title);
+            act_t->setData(url);
+
+            icon.clear();
+            title.clear();
+            url.clear();
+        }
     }
-    else
-        QDesktopServices::openUrl(QUrl(QString("http://twitter.com/home?status=%1").arg(ss)));
-}
-
-void Previewdesc::on_pushButton_save_friendfeed_clicked()
-{
-    //http://frienfeed.com/?title=
-    QDesktopServices::openUrl(QUrl(QString("http://friendfeed.com/?title=%1").arg(text_desc->toPlainText())));
-}
-
-void Previewdesc::on_pushButton_save_buzz_clicked()
-{
-    //http://www.google.com/buzz/post?title=
-    QDesktopServices::openUrl(QUrl(QString("http://www.google.com/buzz/post?title=%1").arg(text_desc->toPlainText())));
-}
-
-void Previewdesc::on_pushButton_save_vkontakte_clicked()
-{
-    //http://vkontakte.ru/share.php?title=&url=
-    QDesktopServices::openUrl(QUrl(QString("http://vkontakte.ru/share.php?url=%1vk/1/&title=%2").arg(link_kp).arg(text_desc->toPlainText())));
-}
-
-void Previewdesc::on_pushButton_save_facebook_clicked()
-{
-    //http://www.facebook.com/sharer.php?u=
-    QString url(link_kp);
-    url.append("fb/1/");
-    QString url1(QString("http://www.facebook.com/sharer.php?u=%1").arg(url));//QString(QUrl::toPercentEncoding(url))));
-    QDesktopServices::openUrl(QUrl(url1,QUrl::StrictMode));
+    file.close();
+    pushButton_export->setMenu(menu_export);
+    connect(menu_export,SIGNAL(triggered(QAction*)),this,SLOT(on_menu_export_triggered(QAction*)));
 }

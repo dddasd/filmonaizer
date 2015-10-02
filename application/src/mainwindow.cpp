@@ -30,10 +30,11 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     if (!QDir(Fdir_result).exists()) QDir("").mkdir(Fdir_result);
     if (!QDir(Fdir_plugins).exists()) QDir("").mkdir(Fdir_plugins);
 
+    menu_export = new QMenu;
+
     read_settings();
 
     translation(Fcurrent_locale);
-
 
     //Load Plugins
     search_plugin();
@@ -133,22 +134,6 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     label_icon->resize(QSize(23,23));
     label_icon->setToolTip("");
     statusbar_main->addWidget(label_icon);
-
-    menu_export = new QMenu;
-    QAction *act_t;
-    //act_t = menu_export->addAction(QIcon(":icons/buzz.png"),QString(tr("Send to Google Buzz")));
-    //act_t->setObjectName("Action_bz");
-    act_t = menu_export->addAction(QIcon(":icons/twitter.png"),QString(tr("Send to Twitter")));
-    act_t->setObjectName("Action_tw");
-    //act_t = menu_export->addAction(QIcon(":icons/ff.png"),QString(tr("Send to FriendFeed")));
-    //act_t->setObjectName("Action_ff");
-    act_t = menu_export->addAction(QIcon(":icons/facebook.png"),QString(tr("Send to Facebook")));
-    act_t->setObjectName("Action_fb");
-    act_t = menu_export->addAction(QIcon(":icons/vkontakte.png"),QString(tr("Send to VKontakte")));
-    act_t->setObjectName("Action_vk");
-    pushButton_export->setMenu(menu_export);
-    //connect(menu_export,SIGNAL(triggered(QAction*)),this,SLOT(on_menu_export_triggered(QAction*)));
-
 
     movie = new QMovie(":/icons/loading.gif");
     connect(movie,SIGNAL(frameChanged(int)),this,SLOT(setItemIcon(int)));
@@ -365,7 +350,7 @@ void MainWindow::slotPars(int ii,QString err) {
                 /*else */
                 text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
-                Previewdesc *prev = new Previewdesc(text_otb,"",templ,j);
+                Previewdesc *prev = new Previewdesc(text_otb,"",templ,j,Fcurrent_locale);
                 prev->setAttribute(Qt::WA_DeleteOnClose);
                 prev->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
                 connect(prev,SIGNAL(template_change(QString)),this,SLOT(template_change(QString)));
@@ -383,6 +368,46 @@ void MainWindow::slotPars(int ii,QString err) {
             save_description(true);
             label_icon->setText("<img src="":icons/new/tick-button.png"" />");
             label_icon->setToolTip("");
+            break;
+        case 3: //OpenUrl
+            if (ii == 0) {
+                if (treeWidget_templates->topLevelItemCount() == 0) {
+                    QMessageBox msgBox;
+                    msgBox.setText(tr("Not search a template!"));
+                    msgBox.setStandardButtons(QMessageBox::Ok);
+                    msgBox.setButtonText(QMessageBox::Ok,tr("Ok"));
+                    msgBox.setDefaultButton(QMessageBox::Ok);
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                    return;
+                }
+
+                QList<QString> templ;
+                int j = (-1);
+                for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
+                    templ.append(treeWidget_templates->topLevelItem(i)->text(0));
+                    if (j==(-1)) {
+                        if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {
+                            j = i;
+                        }
+                    }
+                }
+
+                if (j==(-1)) j = 0;
+
+                QString text_otb = "";
+                QString FnameFile = "";
+                QString FextFile = "";
+                QString Fcodec = "";
+                QString FpathSave = "";
+                QString FnameFileCover = "";
+                int FsaveTo = (-1);
+                int FsaveCover = (-1);
+
+                text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
+
+                QDesktopServices::openUrl(QUrl(QString(FopenUrl).arg(text_otb)));
+            }
             break;
     }
     FparsCommand = (-1);
@@ -731,12 +756,14 @@ void MainWindow::translation(QString i) {
             qApp->installTranslator(&trans);
             retranslateUi(this);
             Fcurrent_locale = i;
+            create_menu_export();
             return;
         }
     }
     qApp->removeTranslator(&trans);
     retranslateUi(this);
     Fcurrent_locale = "en_US";
+    create_menu_export();
 }
 
 void MainWindow::search_plugin() {
@@ -1451,4 +1478,101 @@ void MainWindow::change_plugins(QString pl_s,QString pl_m) {
         Fcurrent_plugins_movie = pl_m;
         load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
     }
+}
+
+void MainWindow::on_checkBox_save_templates_stateChanged(int state) {
+    lineEdit_dir_obzor->setEnabled(state == Qt::Checked ? false : true);
+    pushButton_dir_obzor->setEnabled(state == Qt::Checked ? false : true);
+}
+
+void MainWindow::on_menu_export_triggered(QAction *act) {
+    qDebug() << act->data().toString();
+    FopenUrl = act->data().toString();
+
+    if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0)) {
+        label_icon->setText("<img src="":icons/new/information-button.png"" />");
+
+        int count_movie = (-1);
+
+        for (int i = 0; i < film_item.length(); i++) {
+            if ((treeWidget_search_result->currentItem() == film_item[i]) ||
+                (treeWidget_search_result->currentItem() == desc_item[i]) ||
+                (treeWidget_search_result->currentItem() == image_item[i])) {
+                count_movie = i;
+                break;
+            }
+        }
+
+        if (count_movie == (-1)) {
+            for (int i = 0; i < film_item.length(); i++) {
+                if (treeWidget_search_result->currentItem()->parent() == image_item[i]) {
+                    count_movie = i;
+                    break;
+                }
+            }
+        }
+
+        if (count_movie == (-1)) {
+            return;
+        }
+
+        FparsCommand = 3;
+        plugin_search->result_pars_movie(count_movie,Fdir_tmp);
+    }
+}
+
+void MainWindow::create_menu_export() {
+    disconnect(menu_export,SIGNAL(triggered(QAction*)),this,SLOT(menu_export_triggered(QAction*)));
+    QList<QAction *> act = menu_export->actions();
+    for (int i = 0; i < act.count(); i++) menu_export->removeAction(act[i]);
+
+    QFile file(QDir::toNativeSeparators(QApplication::applicationDirPath()+"/sendto.list"));
+
+    if (!file.exists()) return;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+    QString icon = "",url = "",title = "";
+    while (!file.atEnd()) {
+        QString line(file.readLine());
+
+        QRegExp rr("([^:]*)+:");
+
+        if (rr.indexIn(line,0)!=(-1)) {
+            line.remove(rr.cap(0));
+            if (rr.cap(1) == "title") {
+                QRegExp rr1("([^:]*)+:+([^,]*)+,");
+                while (rr1.indexIn(line,0)!=(-1)) {
+                    if (rr1.cap(1) == Fcurrent_locale) {
+                        title = rr1.cap(2);
+                        break;
+                    }
+                    line.remove(rr1.cap(0));
+                }
+            }
+            if (rr.cap(1) == "url") {
+                if( line.endsWith("\n") ) line.truncate( line.length() - 1 );
+                url = line;
+            }
+            if (rr.cap(1) == "icon") {
+                if( line.endsWith("\n") ) line.truncate( line.length() - 1 );
+                icon = line;
+            }
+        }
+
+        if ((!icon.isEmpty()) && (!title.isEmpty()) && (!url.isEmpty())) {
+            QPixmap pp;
+            pp.loadFromData(QByteArray::fromBase64(icon.toUtf8()));
+            QIcon icon_(pp);
+
+            QAction *act_t = menu_export->addAction(icon_,title);
+            act_t->setData(url);
+
+            icon.clear();
+            title.clear();
+            url.clear();
+        }
+    }
+    file.close();
+    pushButton_export->setMenu(menu_export);
+    connect(menu_export,SIGNAL(triggered(QAction*)),this,SLOT(on_menu_export_triggered(QAction*)));
 }
