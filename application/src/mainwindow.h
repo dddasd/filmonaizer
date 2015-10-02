@@ -27,6 +27,7 @@
 #include "previewcover.h"
 #include "edit_templates.h"
 #include "dialog_plugins.h"
+#include "dialog_variables.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow_filmonaizer {
     Q_OBJECT

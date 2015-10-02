@@ -4,7 +4,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     setupUi(this);
 
     Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}"
-                 << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}" << "{;template_description}";
+                 << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}" << "{;template_description}" << "{;custom}";
 
     if (!p) {
         Fdir_settings = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer");
@@ -837,6 +837,7 @@ QString MainWindow::pars_template(QString file_name,
     int FsaveCover = (-1);
 
     //Search global tegs
+    QList<list_variables> Flist_variables;
     QRegExp reg_exp("\\{;([^=]*)=([^}]*)\\}+(.*)\\n");
     reg_exp.setMinimal(true);
     int pos_r = reg_exp.indexIn(file_shab,0);
@@ -885,10 +886,42 @@ QString MainWindow::pars_template(QString file_name,
             if (!b) FsaveCover = (-1);
         }
 
+        QRegExp reg_exp_tmp("custom([^=]*)=\\(name=\"([^\"]*)\"\\)([^\\}]*)+\\}");
+        if (reg_exp_tmp.indexIn(reg_exp.cap(0),0)!=(-1)) {
+            list_variables list_v_temp;
+            list_v_temp.tag = QString("custom%1").arg(reg_exp_tmp.cap(1));
+            list_v_temp.name_v = reg_exp_tmp.cap(2);
+            QRegExp reg_exp_tmp2("\\(item=\"([^\"]*)\"\\)");
+            int j = reg_exp_tmp2.indexIn(reg_exp_tmp.cap(3),0);
+            while(j!=(-1)) {
+                list_v_temp.value_v.append(reg_exp_tmp2.cap(1));
+                j = reg_exp_tmp2.indexIn(reg_exp_tmp.cap(3),j+1);
+            }
+
+            QRegExp reg_exp_tmp3(QString("\\{%1\\}").arg(list_v_temp.tag));
+            if (reg_exp_tmp3.indexIn(file_shab,0)!=(-1)) {
+                Flist_variables << list_v_temp;
+            }
+        }
+
         file_shab.replace(reg_exp.cap(0),"");
         pos_r = reg_exp.indexIn(file_shab,0);
     }
     //\Search global tegs
+
+    if (Flist_variables.count() > 0) {
+        dialog_variables *dial = new dialog_variables(Flist_variables,this);
+        dial->setAttribute(Qt::WA_DeleteOnClose);
+        dial->exec();
+
+        for (int i = 0; i < Flist_variables.count(); i++) {
+            reg_exp.setPattern(QString("\\{%1\\}").arg(Flist_variables[i].tag));
+            if (reg_exp.indexIn(file_shab,0)!=(-1)) {
+                file_shab.replace(reg_exp.cap(0),Flist_variables[i].value_s);
+            }
+        }
+        Flist_variables.clear();
+    }
 
     //
     reg_exp.setPattern("\\{:([^\\}]*)+\\}");
@@ -1306,17 +1339,21 @@ void MainWindow::slot_form_download_image(QString id) {
 
 void MainWindow::on_pushButton_edit_templates_clicked() {
     save_templates();
+    QString n_sh = "";
     for (int i=0;i<treeWidget_templates->topLevelItemCount();i++)
         if (treeWidget_templates->topLevelItem(i)==treeWidget_templates->currentItem()) {
-            Edit_Templates *ab;
-            ab = new Edit_Templates(Fdir_templates,treeWidget_templates->topLevelItem(i)->text(0),Ftags_global,Ftags_plug,Ftags_mediafile,this);
-            ab->setAttribute(Qt::WA_DeleteOnClose);
-            ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
-            ab->setWindowModality(Qt::ApplicationModal);
-            ab->show();
-            connect(ab,SIGNAL(destroyed(QObject*)),this,SLOT(search_templates()));
+            n_sh = treeWidget_templates->topLevelItem(i)->text(0);
             break;
         }
+
+    Edit_Templates *ab;
+    ab = new Edit_Templates(Fdir_templates,n_sh,Ftags_global,Ftags_plug,Ftags_mediafile,this);
+    ab->setAttribute(Qt::WA_DeleteOnClose);
+    ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint);
+    ab->setWindowModality(Qt::ApplicationModal);
+    ab->show();
+    connect(ab,SIGNAL(destroyed(QObject*)),this,SLOT(search_templates()));
+    return;
 }
 
 void MainWindow::search_templates() {

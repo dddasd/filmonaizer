@@ -1,8 +1,6 @@
 #include "edit_templates.h"
 
-Highlighter::Highlighter(QTextDocument *parent)
-    : QSyntaxHighlighter(parent)
-{
+Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     tagsFormat.setFontWeight(QFont::Bold);
     tagsFormat.setForeground(Qt::darkBlue);
 
@@ -20,8 +18,7 @@ Highlighter::Highlighter(QTextDocument *parent)
     highlightingRules.append(hh);
 }
 
-void Highlighter::highlightBlock(const QString &text)
-{
+void Highlighter::highlightBlock(const QString &text) {
     foreach (const HighlightingRule &rule, highlightingRules) {
         QRegExp expression(rule.pattern);
         int index = expression.indexIn(text);
@@ -34,13 +31,8 @@ void Highlighter::highlightBlock(const QString &text)
     setCurrentBlockState(0);
 }
 
-Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QString> tags_global, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent)
-    : QMainWindow(parent)
-{
-    if (!file_templates.isEmpty())
-        tek_file = dir + QDir::separator() + file_templates;
-    else
-        tek_file = "";
+Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QString> tags_global, QList<QString> tags_plug_search, QList<QString> tags_plug_mediainfo, QWidget *parent) : QMainWindow(parent) {
+    tek_file = file_templates.isEmpty() ? "" : QDir::toNativeSeparators(QString(dir+"/"+file_templates));
     dir_file = dir;
 
     this->setObjectName(QString::fromUtf8("form_set_templates"));
@@ -228,8 +220,7 @@ Edit_Templates::Edit_Templates(QString dir, QString file_templates, QList<QStrin
     resize(500,300);
 }
 
-void Edit_Templates::create_menu_open()
-{
+void Edit_Templates::create_menu_open() {
     disconnect(tool_open,SIGNAL(triggered(QAction*)),this,SLOT(_triggered_open(QAction*)));
     menu_open->clear();
     QDir dir;
@@ -246,26 +237,13 @@ void Edit_Templates::create_menu_open()
     connect(tool_open,SIGNAL(triggered(QAction*)),this,SLOT(_triggered_open(QAction*)));
 }
 
-void Edit_Templates::modif(bool b)
-{
+void Edit_Templates::modif(bool b) {
     tool_save->setEnabled(b);
-    if (b)
-    {
-        if (tek_file.isEmpty())
-            setWindowTitle(QString(tr("%1* - Edit templates")).arg(tr("New")));
-        else
-            setWindowTitle(QString(tr("%1* - Edit templates")).arg(QFileInfo(tek_file).fileName()));
-    }
-    else {
-        if (tek_file.isEmpty())
-            setWindowTitle(QString(tr("%1 - Edit templates")).arg(tr("New")));
-        else
-            setWindowTitle(QString(tr("%1 - Edit templates")).arg(QFileInfo(tek_file).fileName()));
-    }
+    QString title = tek_file.isEmpty() ? QString(tr("%1* - Edit templates")).arg(tr("New")) : QString(tr("%1* - Edit templates")).arg(QFileInfo(tek_file).fileName());
+    setWindowTitle(title);
 }
 
-void Edit_Templates::_triggered_open(QAction* ret)
-{
+void Edit_Templates::_triggered_open(QAction* ret) {
     if ((ret==menu_open->actions()[menu_open->actions().length()-1]) || (ret->isSeparator())) {
         if (!ret->isSeparator()) {
             QString filename = QString::fromLocal8Bit(QFileDialog::getOpenFileName(this, tr("Select a templates file"),
@@ -707,8 +685,7 @@ void Edit_Templates::_triggered_open(QAction* ret)
     create_menu_open();
 }
 
-void Edit_Templates::_triggered_tags(QAction* ret)
-{
+void Edit_Templates::_triggered_tags(QAction* ret) {
     QTextCursor cur = text_templates->textCursor();
 	if(ret->text()!="{;custom}") {
 		int i = cur.position();
@@ -724,8 +701,7 @@ void Edit_Templates::_triggered_tags(QAction* ret)
 	text_templates->setTextCursor(cur);
 }
 
-void Edit_Templates::_triggered_symbol(QAction* ret)
-{
+void Edit_Templates::_triggered_symbol(QAction* ret) {
     QTextCursor cur = text_templates->textCursor();
     if (ret->text()=="{")
         cur.insertText("&#123;");
@@ -734,8 +710,7 @@ void Edit_Templates::_triggered_symbol(QAction* ret)
     text_templates->setTextCursor(cur);
 }
 
-void Edit_Templates::new_file()
-{
+void Edit_Templates::new_file() {
     if (tool_save->isEnabled()) {
         QMessageBox msgBox(this);
         msgBox.setText(tr("The file is modified."));
@@ -1029,8 +1004,7 @@ void Edit_Templates::new_file()
     create_menu_open();
 }
 
-void Edit_Templates::save_file()
-{
+void Edit_Templates::save_file() {
     if (tek_file.isEmpty()) {
         QString fileName = "";
         for (int i=0;;i++) {
@@ -1272,8 +1246,7 @@ void Edit_Templates::save_file()
     create_menu_open();
 }
 
-void Edit_Templates::delete_file()
-{
+void Edit_Templates::delete_file() {
     if (tek_file.isEmpty()) {
         text_templates->clear();
         tek_file = "";
@@ -1326,13 +1299,11 @@ void Edit_Templates::delete_file()
     create_menu_open();
 }
 
-void Edit_Templates::closeEvent(QCloseEvent *event)
-{
+void Edit_Templates::closeEvent(QCloseEvent *event) {
     tool_save->click();
     event->accept();
 }
 
-void Edit_Templates::open_help()
-{
+void Edit_Templates::open_help() {
     QDesktopServices::openUrl(QUrl("http://wiki.soulruins.info/filmonaizer/help/start"));
 }
