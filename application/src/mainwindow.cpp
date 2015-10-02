@@ -157,18 +157,14 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     bool_fr_pr_image = false;
 }
 
-MainWindow::~MainWindow() {    
-    if (checkBox_save_templates->checkState()==Qt::Checked) FtemplateCheck = true;
-    else FtemplateCheck = false;
+MainWindow::~MainWindow() {
+    FtemplateCheck = (checkBox_save_templates->checkState()==Qt::Checked);
 
-    if (radioButton_rewrite_yes->isChecked()) FrewriteFile = true;
-    else FrewriteFile = false;
+    FrewriteFile = radioButton_rewrite_yes->isChecked();
 
-    if (checkBox_saving_mode_traffic->checkState()==Qt::Checked) FSavingModeTraffic = true;
-    else FSavingModeTraffic = false;
+    FSavingModeTraffic = (checkBox_saving_mode_traffic->checkState()==Qt::Checked);
 
-    if (checkBox_clear_tmp_folder->checkState()==Qt::Checked) Fclear_tmp_exit = true;
-    else Fclear_tmp_exit = false;
+    Fclear_tmp_exit = (checkBox_clear_tmp_folder->checkState()==Qt::Checked);
 
     write_settings();
 
@@ -241,7 +237,7 @@ void MainWindow::on_pushButton_search_clicked() {
         comboBox_history_movie->setCurrentIndex(comboBox_history_movie->count()-1);
 
         if ((Fproxy) && (Fproxy_list.count() > 0)) {
-            if ((Fcurrent_proxy < 0) && (Fcurrent_proxy >= Fproxy_list.count())) {
+            if ((Fcurrent_proxy < 0) || (Fcurrent_proxy >= Fproxy_list.count())) {
                 Fcurrent_proxy = 0;
             }
             plugin_search->set_proxy(Fproxy,Fproxy_list[Fcurrent_proxy].host,Fproxy_list[Fcurrent_proxy].port,
@@ -289,11 +285,6 @@ bool MainWindow::load_plugin_movie(QString fileName) {
         if (!plugin_movie) return false;
         else {
             plugin_movie->init_plug();
-            //QObject *ttt = plugin_movie->notifyer();
-            //connect(ttt,SIGNAL(signalSearch(QList<QString>,int,QString)),this,SLOT(slotSearch(QList<QString>,int,QString)));
-            //connect(ttt,SIGNAL(signalPars(int,QString)),this,SLOT(slotPars(int,QString)));
-            //connect(ttt,SIGNAL(signalSmallImage(int,QList<QString>)),this,SLOT(slotSmallImage(int,QList<QString>)));
-            //connect(ttt,SIGNAL(signalDownloadImage(int,int)),this,SLOT(slotDownloadImage(int,int)));
             Ftags_mediafile.clear();
             Ftags_mediafile = plugin_movie->listTags();
             qDebug() << Ftags_mediafile;
@@ -346,8 +337,6 @@ void MainWindow::slotPars(int ii,QString err) {
                 int FsaveTo = (-1);
                 int FsaveCover = (-1);
 
-                //if (j==0) text_otb = defaul_templ();
-                /*else */
                 text_otb = pars_template(Fdir_templates+"/"+templ[j],FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
                 Previewdesc *prev = new Previewdesc(text_otb,"",templ,j,Fcurrent_locale);
@@ -468,8 +457,7 @@ QString MainWindow::template_change(QString templ) {
     QString FnameFileCover = "";
     int FsaveTo = (-1);
     int FsaveCover = (-1);
-    //if (templ=="default") text_otb = defaul_templ();
-    /*else */
+
     text_otb = pars_template(Fdir_templates+"/"+templ,FnameFile,FextFile,Fcodec,FpathSave,FnameFileCover,FsaveTo,FsaveCover);
 
     return text_otb;
@@ -538,7 +526,6 @@ void MainWindow::itemDoubleClicked(QTreeWidgetItem* ret,int col) {
     plugin_search->download_image(ret->text(0),Fdir_tmp);
     form_pr_image->show();
     bool_fr_pr_image = true;
-    //form_pr_image = NULL;
 }
 
 void MainWindow::on_pushButton_expand_clicked() {
@@ -586,16 +573,6 @@ void MainWindow::expanded(bool ex) {
         expand_s = true;
     }
 }
-
-/*
-QString MainWindow::defaul_templ() {
-    QString ret = "";
-    for (int i = 0; i < Ftags_plug.count(); i++) {
-        ret.append(QString("%1 - %2\n").arg(Ftags_plug[i]).arg(plugin_search->result_tags(Ftags_plug[i])));
-    }
-    return ret;
-}
-*/
 
 void MainWindow::on_pushButton_about_clicked() {
     AboutDialog *ab;
@@ -1083,47 +1060,7 @@ void MainWindow::save_description(bool saveBuf) {
         }
     } else {
         for (int i=0;i<treeWidget_templates->topLevelItemCount();i++) {
-            if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {
-                /*if (i == 0) { //default
-                    QFile file(QDir::toNativeSeparators(Fdir_result+"/result.txt"));
-
-                    if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
-                        QMessageBox msgBox;
-                        msgBox.setText(tr("The file already exists."));
-                        msgBox.setInformativeText(tr("Rewrite?")+"\n"+QString(Fdir_result+"/result.txt"));
-                        msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::Yes | QMessageBox::NoToAll | QMessageBox::No);
-                        msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
-                        msgBox.setButtonText(QMessageBox::No,tr("No"));
-                        msgBox.setButtonText(QMessageBox::YesToAll,tr("Yes to all"));
-                        msgBox.setButtonText(QMessageBox::NoToAll,tr("No to all"));
-                        msgBox.setDefaultButton(QMessageBox::Ok);
-                        switch (msgBox.exec()) {
-                            case QMessageBox::No:
-                                for (int i=1;;i++){
-                                    if (!file.exists(QDir::toNativeSeparators(QString(Fdir_result+"/result(%1).txt")).arg(i))) {
-                                        file.setFileName(QDir::toNativeSeparators(QString(Fdir_result+"/result(%1).txt")).arg(i));
-                                        break;
-                                    }
-                                }
-                                break;
-                            case QMessageBox::YesToAll:
-                                resave = 1;
-                                break;
-                            case QMessageBox::NoToAll:
-                                resave = 2;
-                                for (int i=1;;i++){
-                                    if (!file.exists(QDir::toNativeSeparators(QString(Fdir_result+"/result(%1).txt")).arg(i))) {
-                                        file.setFileName(QDir::toNativeSeparators(QString(Fdir_result+"/result(%1).txt")).arg(i));
-                                        break;
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                    file.open(QIODevice::WriteOnly);
-                    file.write(defaul_templ().toUtf8());
-                    file.close();
-                } else {*/
+            if (treeWidget_templates->topLevelItem(i)->checkState(0)==Qt::Checked) {                
                     QString text_otb = "";
                     QString FnameFile = "";
                     QString FextFile = "";
@@ -1446,10 +1383,7 @@ void MainWindow::on_pushButton_movie_obzor_clicked() {
 
 void MainWindow::check_stat(QList<int> check) {
     for (int i=0;i<treeWidget_search_result->currentItem()->parent()->childCount();i++) {
-        if (check[i]==0)
-            treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,Qt::Checked);
-        else
-            treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,Qt::Unchecked);
+        treeWidget_search_result->currentItem()->parent()->child(i)->setCheckState(0,check[i]==0 ? Qt::Checked : Qt::Unchecked);
     }
 }
 
