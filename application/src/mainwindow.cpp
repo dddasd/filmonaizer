@@ -4,7 +4,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     setupUi(this);
 
     Ftags_global << "{;name_file}" << "{;ext_file}" << "{;cut_end}" << "{;codec}" << "{;path_save}"
-                 << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}";
+                 << "{;save_to}" << "{;save_cover}" << "{;name_file_cover}" << "{;template_description}";
 
     if (!p) {
         Fdir_settings = QDir::toNativeSeparators(QDir::homePath()+"/.filmonaizer");
@@ -745,6 +745,7 @@ void MainWindow::create_item_tree_templ(QString name, bool ch) {
         new_item->setCheckState(0,Qt::Checked);
     else
         new_item->setCheckState(0,Qt::Unchecked);
+    new_item->setToolTip(0,read_template_description(QDir::toNativeSeparators(Fdir_templates+"/"+name)));
 
     treeWidget_templates->insertTopLevelItem(0,new_item);
 }
@@ -1575,4 +1576,39 @@ void MainWindow::create_menu_export() {
     file.close();
     pushButton_export->setMenu(menu_export);
     connect(menu_export,SIGNAL(triggered(QAction*)),this,SLOT(on_menu_export_triggered(QAction*)));
+}
+
+QString MainWindow::read_template_description(QString file_name) {
+    QFile file_s;
+    file_s.setFileName(QDir::toNativeSeparators(file_name));
+    qDebug() << file_name;
+
+    if (!file_s.exists()) {
+        qDebug() << QString("%1 - %2").arg(tr("not exists file template")).arg(file_name);
+        return "";
+    }
+
+    if (!file_s.open(QIODevice::ReadOnly)) {
+        qDebug() << QString("%1 - %2").arg(tr("not open file template")).arg(file_name);
+        return "";
+    }
+
+    QString file_shab = QString::fromUtf8(file_s.readAll());
+    file_s.close();
+
+    //Search global tegs
+    QRegExp reg_exp("\\{;([^=]*)=([^}]*)\\}+(.*)\\n");
+    reg_exp.setMinimal(true);
+    int pos_r = reg_exp.indexIn(file_shab,0);
+    while (pos_r!=(-1)) {
+        if (reg_exp.cap(1)=="template_description") {
+            if (reg_exp.cap(2).indexOf("\"")!=(-1)) {
+                return reg_exp.cap(2).replace("\"","");
+            } else return reg_exp.cap(2);
+        }
+
+        file_shab.replace(reg_exp.cap(0),"");
+        pos_r = reg_exp.indexIn(file_shab,0);
+    }
+    return "";
 }

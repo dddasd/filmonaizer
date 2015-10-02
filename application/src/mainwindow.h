@@ -122,6 +122,8 @@ private:
     QString pars_template(QString,QString&,QString&,QString&,QString&,QString&,int&,int&);
 
     void save_description(bool);
+
+    QString read_template_description(QString);
 private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
