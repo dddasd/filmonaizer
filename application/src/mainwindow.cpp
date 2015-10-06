@@ -39,7 +39,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     //Load Plugins
     search_plugin();
 
-    if (Ffilename_plugin_search.isEmpty()) {
+    if (FlistPluginsSearch.isEmpty()) {
         QMessageBox msgBox(QMessageBox::Warning,tr("Fatal error"),tr("Not detected any plugins"),0,this);
         msgBox.addButton(QMessageBox::Ok);
         msgBox.exec();
@@ -49,19 +49,19 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     }
 
     bool plg = false;
-    for (int i = 0; i < Ffilename_plugin_search.count(); i++) {
-        if (Fcurrent_plugins_search == Ffilename_plugin_search[i]) {
+    for (int i = 0; i < FlistPluginsSearch.count(); i++) {
+        if (Fcurrent_plugins_search == FlistPluginsSearch[i].filename) {
             plg = true;
             break;
         }
     }
-    if (!plg) Fcurrent_plugins_search = Ffilename_plugin_search[0];
+    if (!plg) Fcurrent_plugins_search = FlistPluginsSearch[0].filename;
     plg = load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
     if (!plg) {
-        for (int i = 0; i < Ffilename_plugin_search.count(); i++) {
+        for (int i = 0; i < FlistPluginsSearch.count(); i++) {
             plg = load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
             if (plg) {
-                Fcurrent_plugins_search = Ffilename_plugin_search[i];
+                Fcurrent_plugins_search = FlistPluginsSearch[i].filename;
                 break;
             }
         }
@@ -75,24 +75,24 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
         }
     }
 
-    if (Ffilename_plugin_movie.isEmpty()) {
+    if (FlistPluginsMovie.isEmpty()) {
         pushButton_movie_obzor->setEnabled(false);
         qDebug() << "not loaded plugin MediaFile";
     } else {
         plg = false;
-        for (int i = 0; i < Ffilename_plugin_movie.count(); i++) {
-            if (Fcurrent_plugins_movie == Ffilename_plugin_movie[i]) {
+        for (int i = 0; i < FlistPluginsMovie.count(); i++) {
+            if (Fcurrent_plugins_movie == FlistPluginsMovie[i].filename) {
                 plg = true;
                 break;
             }
         }
-        if (!plg) Fcurrent_plugins_movie = Ffilename_plugin_movie[0];
+        if (!plg) Fcurrent_plugins_movie = FlistPluginsMovie[0].filename;
         plg = load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
         if (!plg) {
-            for (int i = 0; i < Ffilename_plugin_movie.count(); i++) {
+            for (int i = 0; i < FlistPluginsMovie.count(); i++) {
                 plg = load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
                 if (plg) {
-                    Fcurrent_plugins_movie = Ffilename_plugin_search[i];
+                    Fcurrent_plugins_movie = FlistPluginsMovie[i].filename;
                     break;
                 }
             }
@@ -144,12 +144,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
     lineEdit_dir_obzor->setText(Fdir_result);
 
     if (FtemplateCheck) checkBox_save_templates->setCheckState(Qt::Checked);
-
-    if (FrewriteFile) radioButton_rewrite_yes->setChecked(true);
-    else radioButton_rewrite_question->setChecked(true);
-
-    if (FSavingModeTraffic) checkBox_saving_mode_traffic->setCheckState(Qt::Checked);
-    if (Fclear_tmp_exit) checkBox_clear_tmp_folder->setCheckState(Qt::Checked);
+    if (FrewriteFile) checkBox_rewite_file->setCheckState(Qt::Checked);
 
     FparsCommand = (-1);
 
@@ -160,11 +155,7 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 MainWindow::~MainWindow() {
     FtemplateCheck = (checkBox_save_templates->checkState()==Qt::Checked);
 
-    FrewriteFile = radioButton_rewrite_yes->isChecked();
-
-    FSavingModeTraffic = (checkBox_saving_mode_traffic->checkState()==Qt::Checked);
-
-    Fclear_tmp_exit = (checkBox_clear_tmp_folder->checkState()==Qt::Checked);
+    FrewriteFile = (checkBox_rewite_file->checkState()==Qt::Checked);
 
     write_settings();
 
@@ -423,7 +414,7 @@ void MainWindow::slotSmallImage(int err, QList<QString> list) {
         treeWidget_search_result->insertTopLevelItem(0,new_item);
     }
 
-    if (checkBox_saving_mode_traffic->checkState() == Qt::Unchecked) plugin_search->download_all_image(Fdir_tmp);
+    if (!FSavingModeTraffic) plugin_search->download_all_image(Fdir_tmp);
 
     image_item[FsmallImageClick]->setExpanded(true);
     label_icon->setText("<img src="":icons/new/tick-button.png"" />");
@@ -537,14 +528,12 @@ void MainWindow::expanded(bool ex) {
         expand = this->height() - treeWidget_templates->height() - 4;
         collapse = this->height();
 
-        groupBox_rewrite->setVisible(false);
+        groupBox_plugins->setVisible(false);
         groupBox_save->setVisible(false);
         treeWidget_templates->setVisible(false);
         pushButton_edit_templates->setVisible(false);
         pushButton_about->setVisible(false);
-        pushButton_set_proxy->setVisible(false);
-        pushButton_packet_file->setVisible(false);
-        checkBox_saving_mode_traffic->setVisible(false);
+        pushButton_settings->setVisible(false);
 
         this->setMinimumSize(this->width(),expand);
         this->setMaximumSize(this->width(),expand);
@@ -555,14 +544,12 @@ void MainWindow::expanded(bool ex) {
         expand_s = false;
     }
     else {
-        groupBox_rewrite->setVisible(true);
+        groupBox_plugins->setVisible(true);
         groupBox_save->setVisible(true);
         treeWidget_templates->setVisible(true);
         pushButton_edit_templates->setVisible(true);
         pushButton_about->setVisible(true);
-        pushButton_set_proxy->setVisible(true);
-        pushButton_packet_file->setVisible(true);
-        checkBox_saving_mode_traffic->setVisible(true);
+        pushButton_settings->setVisible(true);
 
         this->setMinimumSize(this->width(),collapse);
         this->setMaximumSize(this->width(),collapse);
@@ -590,20 +577,6 @@ void MainWindow::on_pushButton_about_clicked() {
     connect(ab,SIGNAL(ch_locale(QString)),this,SLOT(translation(QString)));
     //connect(ab,SIGNAL(save_version(QString,int)),this,SLOT(save_version(QString,int)));
     ab->show();
-}
-
-void MainWindow::on_pushButton_set_proxy_clicked() {
-    Set_proxy *ab = new Set_proxy(Fproxy,Fcurrent_proxy,Fproxy_list,this);
-    ab->setAttribute(Qt::WA_DeleteOnClose);
-    ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
-    connect(ab,SIGNAL(save_settings(bool,int,QList<struct_proxy_list>)),this,SLOT(save_settings_proxy(bool,int,QList<struct_proxy_list>)));
-    ab->show();
-}
-
-void MainWindow::save_settings_proxy(bool proxy, int c_proxy, QList<struct_proxy_list> proxy_list) {
-    Fproxy_list = proxy_list;
-    Fproxy = proxy;
-    Fcurrent_proxy = c_proxy;
 }
 
 void MainWindow::read_settings() {
@@ -754,6 +727,8 @@ void MainWindow::search_plugin() {
 #endif
     QStringList fileNamePlugins = dir.entryList(name_filters,QDir::Files);
 
+    FlistPluginsMovie.clear();
+    FlistPluginsSearch.clear();
     for (int i = 0; i < fileNamePlugins.count(); i++) {
         QString ff = QDir::toNativeSeparators(QString("%1/%2").arg(Fdir_plugins).arg(fileNamePlugins[i]));
 
@@ -764,7 +739,11 @@ void MainWindow::search_plugin() {
         if (plugin) {
             plugin_search = qobject_cast<QInterfacePluginSearch *>(plugin);
             if (plugin_search) {
-                Ffilename_plugin_search << fileNamePlugins[i];
+                struct_plugins_list lp;
+                lp.filename = fileNamePlugins[i];
+                lp.version = plugin_search->getVersion();
+                read_list_plugin(QString("%1.list").arg(ff),&lp);
+                FlistPluginsSearch << lp;
                 continue;
             }
         }
@@ -776,16 +755,63 @@ void MainWindow::search_plugin() {
         if (plugin) {
             plugin_movie = qobject_cast<QInterfacePluginMovie *>(plugin);
             if (plugin_movie) {
-                Ffilename_plugin_movie << fileNamePlugins[i];
+                struct_plugins_list lp;
+                lp.filename = fileNamePlugins[i];
+                lp.version = plugin_movie->getVersion();
+                read_list_plugin(QString("%1.list").arg(ff),&lp);
+                FlistPluginsMovie << lp;
                 continue;
             }
         }
     }
 
     qDebug() << fileNamePlugins;
-    qDebug() << Ffilename_plugin_search;
-    qDebug() << Ffilename_plugin_movie;
+    //qDebug() << Ffilename_plugin_search;
+    //qDebug() << Ffilename_plugin_movie;
+}
 
+void MainWindow::read_list_plugin(QString filename, struct_plugins_list *pl) {
+    QFile file(filename);
+
+    if (!file.exists()) return;
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+    while (file.atEnd()) {
+        QString line(file.readLine());
+
+        QRegExp rr("([^:]*)+:");
+
+        if (rr.indexIn(line,0)!=(-1)) {
+            line.remove(rr.cap(0));
+            if (rr.cap(1) == "description") {
+                QRegExp rr1("([^:]*)+:+([^,]*)+,");
+                while (rr1.indexIn(line,0)!=(-1)) {
+                    if (rr1.cap(1) == Fcurrent_locale) {
+                        pl->description = rr1.cap(2);
+                        break;
+                    }
+                    line.remove(rr1.cap(0));
+                }
+            }
+            if (rr.cap(1) == "title") {
+                QRegExp rr1("([^:]*)+:+([^,]*)+,");
+                while (rr1.indexIn(line,0)!=(-1)) {
+                    if (rr1.cap(1) == Fcurrent_locale) {
+                        pl->title = rr1.cap(2);
+                        break;
+                    }
+                    line.remove(rr1.cap(0));
+                }
+            }
+            if (rr.cap(1) == "icon") {
+                if( line.endsWith("\n") ) line.truncate( line.length() - 1 );
+                pl->icon = QByteArray::fromBase64(line.toUtf8());
+            }
+        }
+    }
+
+    file.close();
 }
 
 QString MainWindow::pars_template(QString file_name,
@@ -910,7 +936,7 @@ QString MainWindow::pars_template(QString file_name,
     //\Search global tegs
 
     if (Flist_variables.count() > 0) {
-        dialog_variables *dial = new dialog_variables(Flist_variables,this);
+        dialog_variables *dial = new dialog_variables(&Flist_variables,this);
         dial->setAttribute(Qt::WA_DeleteOnClose);
         dial->exec();
 
@@ -1164,7 +1190,7 @@ void MainWindow::save_description(bool saveBuf) {
                     QString FAllSaveName(QDir::toNativeSeparators(FpathSave+"/"+FnameFile+"."+FextFile));
                     QFile file(FAllSaveName);
 
-                    if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
+                    if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Checked)) {
                         if (resave==0) {
                             QMessageBox msgBox;
                             msgBox.setText(tr("The file already exists."));
@@ -1263,7 +1289,7 @@ void MainWindow::save_description(bool saveBuf) {
                                 }
                                 file.setFileName(FAllSaveName);
 
-                                if ((file.exists()) && (radioButton_rewrite_question->isChecked())) {
+                                if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Checked)) {
                                     if (resave==0) {
                                         QMessageBox msgBox;
                                         msgBox.setText(tr("The file already exists."));
@@ -1428,18 +1454,6 @@ void MainWindow::slot_form_close() {
     bool_fr_pr_image = false;
 }
 
-void MainWindow::on_pushButton_set_plugins_clicked() {
-    DialogPlugins *dial = new DialogPlugins(Ffilename_plugin_search,Fcurrent_plugins_search,Ffilename_plugin_movie,Fcurrent_plugins_movie,this);
-    dial->setAttribute(Qt::WA_DeleteOnClose);
-    dial->setWindowFlags(Qt::SplashScreen);
-    connect(dial,SIGNAL(save_plug(QString,QString)),this,SLOT(change_plugins(QString,QString)));
-    QPoint pos;
-    pos.setX(this->pos().x()+this->size().width());
-    pos.setY(this->pos().y()+pushButton_set_plugins->pos().y()+pushButton_set_plugins->size().height());
-    dial->move(pos);
-    dial->show();
-}
-
 void MainWindow::change_plugins(QString pl_s,QString pl_m) {
     if (Fcurrent_plugins_search != pl_s) {
         Fcurrent_plugins_search = pl_s;
@@ -1582,4 +1596,10 @@ QString MainWindow::read_template_description(QString file_name) {
         pos_r = reg_exp.indexIn(file_shab,0);
     }
     return "";
+}
+
+void MainWindow::on_pushButton_settings_clicked() {
+    DialogSettings *dial = new DialogSettings(&Fproxy,&Fcurrent_proxy,&Fproxy_list,&Fclear_tmp_exit,&FSavingModeTraffic);
+    dial->setAttribute(Qt::WA_DeleteOnClose);
+    dial->exec();
 }

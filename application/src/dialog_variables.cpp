@@ -1,8 +1,8 @@
 #include "dialog_variables.h"
 
-dialog_variables::dialog_variables(QList<list_variables> vr, QWidget *parent /*= 0*/ ) {
+dialog_variables::dialog_variables(QList<list_variables> *vr, QWidget *parent /*= 0*/ ) {
 	Q_UNUSED(parent);
-    vrb = &vr;
+    vrb = vr;
 	this->setWindowTitle(tr("variables"));
 	this->setWindowFlags(Qt::Dialog | Qt::WindowSystemMenuHint);
 

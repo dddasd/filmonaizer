@@ -155,3 +155,8 @@ QString PluginMovieMediaInfo::result_tags(QString tt) {
     if (i.key() == tt) return i.value();
     else return "";
 }
+
+QString PluginMovieMediaInfo::getVersion() {
+    return version;
+}
+

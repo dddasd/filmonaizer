@@ -36,11 +36,6 @@
         <file>loading.gif</file>
         <file>arrow-circle-double.png</file>
         <file>edit-language.png</file>
-        <file>ff.png</file>
-        <file>twitter.png</file>
-        <file>buzz.png</file>
-        <file>facebook.png</file>
-        <file>vkontakte.png</file>
         <file>new/cross-button.png</file>
         <file>new/exclamation-button.png</file>
         <file>new/information-button.png</file>
@@ -52,5 +47,7 @@
         <file>new/share-balloon.png</file>
         <file>new/slash-button.png</file>
         <file>new/tick-button.png</file>
+        <file>drive-download.png</file>
+        <file>gear.png</file>
     </qresource>
 </RCC>

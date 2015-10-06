@@ -466,3 +466,8 @@ void PluginSearchTheMovieDB::download_all_image(QString dir_tmp) {
         }
     }
 }
+
+QString PluginSearchTheMovieDB::getVersion() {
+    return version;
+}
+

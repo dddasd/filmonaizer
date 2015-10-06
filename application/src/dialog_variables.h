@@ -21,7 +21,7 @@ class dialog_variables : public QDialog
 {
 	Q_OBJECT
 public:
-	dialog_variables(QList<list_variables> vr, QWidget *parent = 0);
+    dialog_variables(QList<list_variables> *vr, QWidget *parent = 0);
 	~dialog_variables();
 
 private:

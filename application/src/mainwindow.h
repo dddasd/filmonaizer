@@ -23,11 +23,18 @@
 
 #include "previewdesc.h"
 #include "aboutdialog.h"
-#include "set_proxy.h"
 #include "previewcover.h"
 #include "edit_templates.h"
-#include "dialog_plugins.h"
 #include "dialog_variables.h"
+#include "dialogsettings.h"
+
+struct struct_plugins_list {
+    QString title;
+    QString description;
+    QString version;
+    QString filename;
+    QByteArray icon;
+};
 
 class MainWindow : public QMainWindow, private Ui::MainWindow_filmonaizer {
     Q_OBJECT
@@ -59,8 +66,10 @@ private:
 /*\Forms*/
 
 /*Plugins*/
-    QList<QString> Ffilename_plugin_search;
-    QList<QString> Ffilename_plugin_movie;
+    QList<struct_plugins_list> FlistPluginsSearch;
+    //QList<QString> Ffilename_plugin_search;
+    QList<struct_plugins_list> FlistPluginsMovie;
+    //QList<QString> Ffilename_plugin_movie;
 
     QString Fcurrent_plugins_search;
     QString Fcurrent_plugins_movie;
@@ -76,6 +85,7 @@ private:
     QList<QString> Ftags_global; //теги глобальные
     QList<QString> Ftags_plug; //теги плагина поиска
     QList<QString> Ftags_mediafile; //теги плагина МедиаФайла
+
 /*\Plugins*/
 
 /*Settings*/
@@ -108,7 +118,6 @@ private:
     bool load_plugin_movie(QString);
 
     void expanded(bool);
-    //QString defaul_templ();
 
     void read_settings();
     void write_settings();
@@ -125,6 +134,8 @@ private:
     void save_description(bool);
 
     QString read_template_description(QString);
+
+    void read_list_plugin(QString filename, struct_plugins_list *pl);
 private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
@@ -136,8 +147,6 @@ private slots:
     void itemExpanded(QTreeWidgetItem*);
     void itemCollapsed(QTreeWidgetItem*);
     void itemDoubleClicked(QTreeWidgetItem*,int);
-
-    void save_settings_proxy(bool,int,QList<struct_proxy_list>);
 
     void translation(QString);
 
@@ -155,10 +164,9 @@ private slots:
     void on_pushButton_savebuffer_clicked();
     void on_pushButton_expand_clicked();
     void on_pushButton_about_clicked();
-    void on_pushButton_set_proxy_clicked();
     void on_pushButton_edit_templates_clicked();
     void on_pushButton_movie_obzor_clicked();
-    void on_pushButton_set_plugins_clicked();
+    void on_pushButton_settings_clicked();
     void on_checkBox_save_templates_stateChanged(int state);
     void on_menu_export_triggered(QAction*);
 };

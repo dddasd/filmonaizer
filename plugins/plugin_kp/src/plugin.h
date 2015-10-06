@@ -15,6 +15,8 @@
 
 #define default_width_sm_image 170
 
+#define version "1.0.0"
+
 class NotifyerSearch: public INotifyerSearch {
     Q_OBJECT
 public:
@@ -45,6 +47,8 @@ public:
     QList<QString> listTags() Q_DECL_OVERRIDE; //Список тегов
 
     QString result_tags(QString) Q_DECL_OVERRIDE; //Возврат значение тега
+
+    QString getVersion() Q_DECL_OVERRIDE; //Версия плагина
 
     INotifyerSearch* notifyer() {
         if (!m_Notifyer) m_Notifyer = new NotifyerSearch();

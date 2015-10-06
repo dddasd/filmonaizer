@@ -36,6 +36,8 @@ public:
     virtual QString result_tags(QString) = 0; //Возврат значение тега
 
     virtual QList<QString> listTags() = 0; //Список тегов из плагина
+
+    virtual QString getVersion() = 0; //Версия плагина
 };
 
 QT_BEGIN_NAMESPACE

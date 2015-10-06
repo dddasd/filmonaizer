@@ -925,3 +925,7 @@ void PluginSearchKP::download_all_image(QString dir_tmp) {
         }
     }
 }
+
+QString PluginSearchKP::getVersion() {
+    return version;
+}
