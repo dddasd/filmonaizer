@@ -136,6 +136,8 @@ private:
     QString read_template_description(QString);
 
     void read_list_plugin(QString filename, struct_plugins_list *pl);
+
+    void create_items_combobox_plug();
 private slots:
     void slotSearch(QList<QString>,int,QString);
     void slotPars(int,QString);
@@ -157,8 +159,6 @@ private slots:
     void slot_form_download_image(QString id);
     void slot_form_close();
 
-    void change_plugins(QString,QString);
-
     void on_pushButton_search_clicked();
     void on_pushButton_savefile_clicked();
     void on_pushButton_savebuffer_clicked();
@@ -169,4 +169,6 @@ private slots:
     void on_pushButton_settings_clicked();
     void on_checkBox_save_templates_stateChanged(int state);
     void on_menu_export_triggered(QAction*);
+
+    void comb_plug_indexChanged(int);
 };

@@ -34,8 +34,6 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 
     read_settings();
 
-    translation(Fcurrent_locale);
-
     //Load Plugins
     search_plugin();
 
@@ -103,6 +101,8 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
         }
         if (plg) pushButton_movie_obzor->setEnabled(true);
     }
+    create_items_combobox_plug();
+    connect(comboBox_plugins,SIGNAL(currentIndexChanged(int)),this,SLOT(comb_plug_indexChanged(int)));
     //Load Plgins end
 
     comboBox_history_movie->setLineEdit(searchLineEdit_movie);
@@ -150,6 +150,8 @@ MainWindow::MainWindow(bool p, QWidget *parent): QMainWindow(parent) {
 
     FimageDownload.clear();
     bool_fr_pr_image = false;
+
+    translation(Fcurrent_locale);
 }
 
 MainWindow::~MainWindow() {
@@ -241,6 +243,9 @@ void MainWindow::on_pushButton_search_clicked() {
 }
 
 bool MainWindow::load_plugin_search(QString fileName) {
+    treeWidget_search_result->clear();
+    FimageDownload.clear();
+    FimageDownloadDone.clear();
     if (!QFile(fileName).exists()) return false;
     if (pluginLoaderSearch.isLoaded()) pluginLoaderSearch.unload();
     pluginLoaderSearch.setFileName(fileName);
@@ -525,15 +530,10 @@ void MainWindow::on_pushButton_expand_clicked() {
 
 void MainWindow::expanded(bool ex) {
     if(ex) {
-        expand = this->height() - treeWidget_templates->height() - 4;
+        expand = this->height() - frame_expanded->height() - widget_filmonaizer->layout()->spacing();
         collapse = this->height();
 
-        groupBox_plugins->setVisible(false);
-        groupBox_save->setVisible(false);
-        treeWidget_templates->setVisible(false);
-        pushButton_edit_templates->setVisible(false);
-        pushButton_about->setVisible(false);
-        pushButton_settings->setVisible(false);
+        frame_expanded->setVisible(false);
 
         this->setMinimumSize(this->width(),expand);
         this->setMaximumSize(this->width(),expand);
@@ -544,12 +544,7 @@ void MainWindow::expanded(bool ex) {
         expand_s = false;
     }
     else {
-        groupBox_plugins->setVisible(true);
-        groupBox_save->setVisible(true);
-        treeWidget_templates->setVisible(true);
-        pushButton_edit_templates->setVisible(true);
-        pushButton_about->setVisible(true);
-        pushButton_settings->setVisible(true);
+        frame_expanded->setVisible(true);
 
         this->setMinimumSize(this->width(),collapse);
         this->setMaximumSize(this->width(),collapse);
@@ -708,6 +703,11 @@ void MainWindow::translation(QString i) {
             retranslateUi(this);
             Fcurrent_locale = i;
             create_menu_export();
+            disconnect(comboBox_plugins,SIGNAL(currentIndexChanged(int)),this,SLOT(comb_plug_indexChanged(int)));
+            for (int i = 0; i < FlistPluginsSearch.count(); i++)
+                read_list_plugin(QDir::toNativeSeparators(QString("%1/%2.list").arg(Fdir_plugins).arg(FlistPluginsSearch[i].filename)),&FlistPluginsSearch[i]);
+            create_items_combobox_plug();
+            connect(comboBox_plugins,SIGNAL(currentIndexChanged(int)),this,SLOT(comb_plug_indexChanged(int)));
             return;
         }
     }
@@ -715,6 +715,11 @@ void MainWindow::translation(QString i) {
     retranslateUi(this);
     Fcurrent_locale = "en_US";
     create_menu_export();
+    disconnect(comboBox_plugins,SIGNAL(currentIndexChanged(int)),this,SLOT(comb_plug_indexChanged(int)));
+    for (int i = 0; i < FlistPluginsSearch.count(); i++)
+        read_list_plugin(QDir::toNativeSeparators(QString("%1/%2.list").arg(Fdir_plugins).arg(FlistPluginsSearch[i].filename)),&FlistPluginsSearch[i]);
+    create_items_combobox_plug();
+    connect(comboBox_plugins,SIGNAL(currentIndexChanged(int)),this,SLOT(comb_plug_indexChanged(int)));
 }
 
 void MainWindow::search_plugin() {
@@ -777,7 +782,7 @@ void MainWindow::read_list_plugin(QString filename, struct_plugins_list *pl) {
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
 
-    while (file.atEnd()) {
+    while (!file.atEnd()) {
         QString line(file.readLine());
 
         QRegExp rr("([^:]*)+:");
@@ -941,7 +946,7 @@ QString MainWindow::pars_template(QString file_name,
         dial->exec();
 
         for (int i = 0; i < Flist_variables.count(); i++) {
-            reg_exp.setPattern(QString("\\{%1\\}").arg(Flist_variables[i].tag));
+            reg_exp.setPattern(QString("\\{:%1\\}").arg(Flist_variables[i].tag));
             if (reg_exp.indexIn(file_shab,0)!=(-1)) {
                 file_shab.replace(reg_exp.cap(0),Flist_variables[i].value_s);
             }
@@ -1190,7 +1195,7 @@ void MainWindow::save_description(bool saveBuf) {
                     QString FAllSaveName(QDir::toNativeSeparators(FpathSave+"/"+FnameFile+"."+FextFile));
                     QFile file(FAllSaveName);
 
-                    if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Checked)) {
+                    if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Unchecked)) {
                         if (resave==0) {
                             QMessageBox msgBox;
                             msgBox.setText(tr("The file already exists."));
@@ -1289,7 +1294,7 @@ void MainWindow::save_description(bool saveBuf) {
                                 }
                                 file.setFileName(FAllSaveName);
 
-                                if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Checked)) {
+                                if ((file.exists()) && (checkBox_rewite_file->checkState() == Qt::Unchecked)) {
                                     if (resave==0) {
                                         QMessageBox msgBox;
                                         msgBox.setText(tr("The file already exists."));
@@ -1454,18 +1459,6 @@ void MainWindow::slot_form_close() {
     bool_fr_pr_image = false;
 }
 
-void MainWindow::change_plugins(QString pl_s,QString pl_m) {
-    if (Fcurrent_plugins_search != pl_s) {
-        Fcurrent_plugins_search = pl_s;
-        load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
-    }
-
-    if (Fcurrent_plugins_movie != pl_m) {
-        Fcurrent_plugins_movie = pl_m;
-        load_plugin_movie(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_movie));
-    }
-}
-
 void MainWindow::on_checkBox_save_templates_stateChanged(int state) {
     lineEdit_dir_obzor->setEnabled(state == Qt::Checked ? false : true);
     pushButton_dir_obzor->setEnabled(state == Qt::Checked ? false : true);
@@ -1602,4 +1595,57 @@ void MainWindow::on_pushButton_settings_clicked() {
     DialogSettings *dial = new DialogSettings(&Fproxy,&Fcurrent_proxy,&Fproxy_list,&Fclear_tmp_exit,&FSavingModeTraffic);
     dial->setAttribute(Qt::WA_DeleteOnClose);
     dial->exec();
+}
+
+void MainWindow::create_items_combobox_plug() {
+    comboBox_plugins->clear();
+
+    for (int i = 0; i < FlistPluginsSearch.count(); i++) {
+        comboBox_plugins->addItem(FlistPluginsSearch[i].title.isEmpty() ? FlistPluginsSearch[i].filename : FlistPluginsSearch[i].title);
+
+        if (!FlistPluginsSearch[i].icon.isEmpty()) {
+            QPixmap pp;
+            pp.loadFromData(FlistPluginsSearch[i].icon);
+            QIcon icon(pp);
+            comboBox_plugins->setItemIcon(i,icon);
+        }
+
+        QString desc = "";
+        if (FlistPluginsSearch[i].description.isEmpty()) {
+            desc = QString(tr("Version: %1")).arg(FlistPluginsSearch[i].version);
+        } else {
+            desc = QString(tr("Description: %1\nVersion: %2")).arg(FlistPluginsSearch[i].description).arg(FlistPluginsSearch[i].version);
+        }
+
+        comboBox_plugins->setItemData(i,desc,Qt::ToolTipRole);
+
+        if (Fcurrent_plugins_search == FlistPluginsSearch[i].filename) comboBox_plugins->setCurrentIndex(i);
+    }
+}
+
+void MainWindow::comb_plug_indexChanged(int index) {
+    if (Fcurrent_plugins_search != FlistPluginsSearch[index].filename) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to change the plugin? Search results will be lost."));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
+        msgBox.setButtonText(QMessageBox::No,tr("No"));
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        msgBox.setIcon(QMessageBox::Question);
+        switch (msgBox.exec()) {
+            case QMessageBox::Yes:
+                Fcurrent_plugins_search = FlistPluginsSearch[index].filename;
+                load_plugin_search(QDir::toNativeSeparators(Fdir_plugins+"/"+Fcurrent_plugins_search));
+                break;
+            default:
+                for (int i = 0; i < FlistPluginsSearch.count(); i++) {
+                    if (FlistPluginsSearch[i].filename == Fcurrent_plugins_search)  {
+                        comboBox_plugins->setCurrentIndex(i);
+                        return;
+                        break;
+                    }
+                }
+                break;
+        }
+    }
 }

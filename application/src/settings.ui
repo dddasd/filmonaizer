@@ -6,16 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
+    <width>479</width>
     <height>304</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>479</width>
+    <height>304</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>479</width>
+    <height>304</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <property name="windowIcon">
+   <iconset resource="../icons/filmonaizer.qrc">
+    <normaloff>:/icons/gear.png</normaloff>:/icons/gear.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="10,3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,5">
      <item>
       <widget class="QGroupBox" name="groupBox_other">
        <property name="title">
@@ -146,6 +162,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QPushButton" name="pushButton_add_proxy">
             <property name="minimumSize">
@@ -161,7 +180,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Settings proxy</string>
+             <string>Add proxy</string>
             </property>
             <property name="text">
              <string/>
@@ -169,6 +188,35 @@
             <property name="icon">
              <iconset resource="../icons/filmonaizer.qrc">
               <normaloff>:/icons/new/plus-button.png</normaloff>:/icons/new/plus-button.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_delete_proxy">
+            <property name="minimumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>23</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Remove proxy</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../icons/filmonaizer.qrc">
+              <normaloff>:/icons/new/minus-button.png</normaloff>:/icons/new/minus-button.png</iconset>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -187,35 +235,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_delete_proxy">
-            <property name="minimumSize">
-             <size>
-              <width>23</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>23</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Settings proxy</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../icons/filmonaizer.qrc">
-              <normaloff>:/icons/new/minus-button.png</normaloff>:/icons/new/minus-button.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>
