@@ -46,7 +46,7 @@ void AboutDialog::on_comboBox_activated(int index)
 
 void AboutDialog::get_updates()
 {
-    http_d = new http_download(this,"http://wiki.soulruins.info/filmonaizer/version",0,Fprox,Fhost,Fport,Fusername,Fpassword);
+    http_d = new http_download(this,"https://wiki.soulruins.info/doku.php?id=filmonaizer/version"/*"http://wiki.soulruins.info/filmonaizer/version"*/,0,Fprox,Fhost,Fport,Fusername,Fpassword);
 	connect(http_d,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d_version(result_url)));
 	http_d->_download();
 

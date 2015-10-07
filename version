@@ -1,0 +1,4 @@
+﻿{
+"main":{"version":"0.3.26","changes":""},
+"plugins":[{"name":"plugin_kp","version":"1.0.0","changes":""},{"name":"plugin_themoviedb","version":"1.0.0","changes":""}]
+}

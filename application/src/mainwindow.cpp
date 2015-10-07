@@ -929,7 +929,7 @@ QString MainWindow::pars_template(QString file_name,
                 j = reg_exp_tmp2.indexIn(reg_exp_tmp.cap(3),j+1);
             }
 
-            QRegExp reg_exp_tmp3(QString("\\{%1\\}").arg(list_v_temp.tag));
+            QRegExp reg_exp_tmp3(QString("\\{:%1\\}").arg(list_v_temp.tag));
             if (reg_exp_tmp3.indexIn(file_shab,0)!=(-1)) {
                 Flist_variables << list_v_temp;
             }
@@ -1006,7 +1006,7 @@ QString MainWindow::pars_template(QString file_name,
 
 
 void MainWindow::on_pushButton_savefile_clicked() {
-    if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0)) {
+    if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0) && (treeWidget_search_result->currentItem() != NULL)) {
         label_icon->setText("<img src="":icons/new/information-button.png"" />");
 
         FCountMovie = (-1);
@@ -1054,7 +1054,7 @@ void MainWindow::on_pushButton_savefile_clicked() {
 }
 
 void MainWindow::on_pushButton_savebuffer_clicked() {
-    if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0)) {
+    if ((treeWidget_search_result->topLevelItemCount() > 0) && (film_item.length() > 0) && (treeWidget_search_result->currentItem() != NULL)) {
         label_icon->setText("<img src="":icons/new/information-button.png"" />");
 
         int count_movie = (-1);
