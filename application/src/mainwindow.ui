@@ -366,35 +366,6 @@
             <item>
              <widget class="QComboBox" name="comboBox_plugins"/>
             </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_update_plugins">
-              <property name="minimumSize">
-               <size>
-                <width>23</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>23</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Search update plugins</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../icons/filmonaizer.qrc">
-                <normaloff>:/icons/arrow-circle-double.png</normaloff>:/icons/arrow-circle-double.png</iconset>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -420,7 +391,10 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,10,1,1">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,10,1,1,1">
+         <property name="spacing">
+          <number>1</number>
+         </property>
          <item>
           <widget class="QPushButton" name="pushButton_edit_templates">
            <property name="minimumSize">
@@ -462,6 +436,35 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_update">
+           <property name="minimumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Search update</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../icons/filmonaizer.qrc">
+             <normaloff>:/icons/arrow-circle-double.png</normaloff>:/icons/arrow-circle-double.png</iconset>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_settings">

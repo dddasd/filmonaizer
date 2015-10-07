@@ -557,20 +557,10 @@ void MainWindow::expanded(bool ex) {
 }
 
 void MainWindow::on_pushButton_about_clicked() {
-    AboutDialog *ab;
-    if ((Fproxy) && (Fproxy_list.count() > 0)) {
-        if ((Fcurrent_proxy < 0) && (Fcurrent_proxy >= Fproxy_list.count())) {
-            Fcurrent_proxy = 0;
-        }
-        ab = new AboutDialog(Fcurrent_locale,Fproxy,Fproxy_list[Fcurrent_proxy].host,Fproxy_list[Fcurrent_proxy].port,
-                             Fproxy_list[Fcurrent_proxy].username,Fproxy_list[Fcurrent_proxy].password);
-    } else {
-        ab = new AboutDialog(Fcurrent_locale);
-    }
+    AboutDialog *ab = new AboutDialog(Fcurrent_locale);
     ab->setAttribute(Qt::WA_DeleteOnClose);
     ab->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     connect(ab,SIGNAL(ch_locale(QString)),this,SLOT(translation(QString)));
-    //connect(ab,SIGNAL(save_version(QString,int)),this,SLOT(save_version(QString,int)));
     ab->show();
 }
 
