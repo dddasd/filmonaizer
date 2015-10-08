@@ -1639,3 +1639,7 @@ void MainWindow::comb_plug_indexChanged(int index) {
         }
     }
 }
+
+void MainWindow::on_pushButton_update_clicked() {
+
+}

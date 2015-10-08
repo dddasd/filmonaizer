@@ -167,6 +167,7 @@ private slots:
     void on_pushButton_edit_templates_clicked();
     void on_pushButton_movie_obzor_clicked();
     void on_pushButton_settings_clicked();
+    void on_pushButton_update_clicked();
     void on_checkBox_save_templates_stateChanged(int state);
     void on_menu_export_triggered(QAction*);
 
