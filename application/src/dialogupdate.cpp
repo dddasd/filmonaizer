@@ -111,7 +111,7 @@ void DialogUpdate::fin_d(result_url res) {
                     }
                 }
             }
-            textBrowserUpdate->append(QString(tr("Link update: %1")).arg(jOb["link_updates"].toString()));
+            textBrowserUpdate->append(QString(tr("Link update: <a href=\"%1\">%1</a>")).arg(jOb["link_updates"].toString()));
         } else {
             textBrowserUpdate->append(tr("Updates not found."));
         }

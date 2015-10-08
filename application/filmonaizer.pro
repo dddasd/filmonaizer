@@ -38,5 +38,5 @@ FORMS += src/mainwindow.ui \
     src/settings.ui \
     src/dialog_updates.ui
 TRANSLATIONS += translate/filmonaizer_ru_RU.ts
-VERSION = 0.3.26
+VERSION = 0.3.25
 include(plugins/searchlineedit/src/searchlineedit.pri)

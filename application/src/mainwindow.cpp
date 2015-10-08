@@ -1641,5 +1641,13 @@ void MainWindow::comb_plug_indexChanged(int index) {
 }
 
 void MainWindow::on_pushButton_update_clicked() {
+    QMap<QString,QString> map_ver;
+    map_ver["main"] = QApplication::applicationVersion();
+    for (int i = 0; i < FlistPluginsSearch.count(); i++) {
+        QString rr = FlistPluginsSearch[i].filename.remove(QString(".%1").arg(QFileInfo(FlistPluginsSearch[i].filename).completeSuffix()));
+        map_ver[rr] = FlistPluginsSearch[i].version;
+    }
 
+    DialogUpdate *dial = new DialogUpdate(map_ver);
+    dial->exec();
 }

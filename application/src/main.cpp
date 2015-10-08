@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 
-#define ApplicationVersion "0.3.26"
+#define ApplicationVersion "0.3.25"
 
 #ifdef QT_DEBUG
 QFile file;

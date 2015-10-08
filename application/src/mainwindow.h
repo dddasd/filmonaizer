@@ -27,6 +27,7 @@
 #include "edit_templates.h"
 #include "dialog_variables.h"
 #include "dialogsettings.h"
+#include "dialogupdate.h"
 
 struct struct_plugins_list {
     QString title;
