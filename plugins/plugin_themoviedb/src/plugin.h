@@ -104,6 +104,7 @@ private:
     void pars_film_result(QByteArray buf);
     void clear_map();
     void pars_small_image(QByteArray buf);
+    void pars_imdb_rating(QByteArray buf);
 private slots:
     void fin_d(result_url);
 };

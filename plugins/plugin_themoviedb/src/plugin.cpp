@@ -35,6 +35,9 @@ void PluginSearchTheMovieDB::clear_map() {
     FmapTags.insert("{:production_companies}","");
     FmapTags.insert("{:production_countries}","");
     FmapTags.insert("{:spoken_languages}","");
+
+    FmapTags.insert("{:vote_imdb}","");
+    FmapTags.insert("{:vote_count_imdb}","");
 }
 
 void PluginSearchTheMovieDB::set_proxy(bool proxy, QString host, QString port, QString username, QString password) {
@@ -227,6 +230,15 @@ void PluginSearchTheMovieDB::fin_d(result_url ret_code) {
             }
             break;
         }
+        case 5: {
+            if (ret_code.code_r!=0) {
+                emit m_Notifyer->signalPars(0,"");
+            }
+            else {
+                pars_imdb_rating(ret_code.buf_d);
+            }
+            break;
+        }
     }
 }
 
@@ -285,7 +297,8 @@ void PluginSearchTheMovieDB::pars_film_result(QByteArray buf) {
 
     QList<QString> list_tags_ar;
     list_tags_ar << "{:actor}" << "{:director}" << "{:producer}" << "{:compositor}" << "{:scenario}" << "{:operator}"
-                 << "{:genres}" << "{:production_companies}" << "{:production_countries}" << "{:spoken_languages}";
+                 << "{:genres}" << "{:production_companies}" << "{:production_countries}" << "{:spoken_languages}"
+                 << "{:vote_imdb}" <<  "{:vote_count_imdb}";
 
     QJsonObject jOb = jDoc.object();
     QMapIterator<QString,QString> i(FmapTags);
@@ -375,7 +388,15 @@ void PluginSearchTheMovieDB::pars_film_result(QByteArray buf) {
         }
     }
 
-    emit m_Notifyer->signalPars(0,"");
+    FmapTags["{:vote_imdb}"] = "";
+    FmapTags["{:vote_count_imdb}"] = "";
+    if (FmapTags["{:imdb_id}"].isEmpty()) {
+        emit m_Notifyer->signalPars(0,"");
+    } else {
+        http_download *hd_search = new http_download(this,QString("http://www.omdbapi.com/?i=%1&plot=short&r=json").arg(FmapTags["{:imdb_id}"]),5,Fproxy,Fhost,Fport,Fusername,Fpassword);
+        connect(hd_search,SIGNAL(fin_potok(result_url)),this,SLOT(fin_d(result_url)));
+        hd_search->_download();
+    }
 }
 
 QList<QString> PluginSearchTheMovieDB::listTags() {
@@ -471,3 +492,19 @@ QString PluginSearchTheMovieDB::getVersion() {
     return version;
 }
 
+void PluginSearchTheMovieDB::pars_imdb_rating(QByteArray buf) {
+    QJsonParseError ir;
+    QJsonDocument jDoc = QJsonDocument::fromJson(buf,&ir);
+
+    qDebug() << buf;
+
+    if (ir.error != 0) {
+        emit m_Notifyer->signalPars(0,"");
+        return;
+    }
+
+    QJsonObject jOb = jDoc.object();
+    FmapTags["{:vote_imdb}"] = jOb["imdbRating"].toString();
+    FmapTags["{:vote_count_imdb}"] = jOb["imdbVotes"].toString();
+    emit m_Notifyer->signalPars(0,"");
+}
