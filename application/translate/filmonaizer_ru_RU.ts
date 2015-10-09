@@ -4,33 +4,21 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../src/aboutdialog.cpp" line="7"/>
+        <location filename="../src/aboutdialog.cpp" line="6"/>
         <source>About %1</source>
         <translation>О программе %1</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.cpp" line="107"/>
-        <location filename="../src/aboutdialog.cpp" line="117"/>
-        <location filename="../src/aboutdialog.cpp" line="127"/>
-        <location filename="../src/aboutdialog.cpp" line="137"/>
-        <location filename="../src/aboutdialog.cpp" line="147"/>
-        <location filename="../src/aboutdialog.cpp" line="157"/>
         <source>Updates</source>
-        <translation>Обновления</translation>
+        <translation type="vanished">Обновления</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.cpp" line="108"/>
         <source>No updates. You use the last version programm.</source>
-        <translation>Нет обновлений. Вы используюте последнюю версию программы.</translation>
+        <translation type="vanished">Нет обновлений. Вы используюте последнюю версию программы.</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.cpp" line="118"/>
-        <location filename="../src/aboutdialog.cpp" line="128"/>
-        <location filename="../src/aboutdialog.cpp" line="138"/>
-        <location filename="../src/aboutdialog.cpp" line="148"/>
-        <location filename="../src/aboutdialog.cpp" line="158"/>
         <source>Not to manage to get the version of the programm</source>
-        <translation>Не удалось получить версию программы</translation>
+        <translation type="vanished">Не удалось получить версию программы</translation>
     </message>
 </context>
 <context>
@@ -50,6 +38,77 @@
     <message>
         <source>Close Window</source>
         <translation type="vanished">Закрыть окно</translation>
+    </message>
+</context>
+<context>
+    <name>DialogUpdate</name>
+    <message>
+        <location filename="../src/dialog_updates.ui" line="14"/>
+        <source>Search Updates</source>
+        <translation>Поиск обновлений</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog_updates.ui" line="44"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="20"/>
+        <source>Search updates......</source>
+        <translation>Поиск обновлений......</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="34"/>
+        <source>When searching the update error occurred.</source>
+        <translation>При поиске обновлений произошла ошибка.</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="35"/>
+        <location filename="../src/dialogupdate.cpp" line="43"/>
+        <source>Error: %1</source>
+        <translation>Ошибка: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="42"/>
+        <source>When processing an update error occurred.</source>
+        <translation>При обработке данных об обновлении произошла ошибка.</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="98"/>
+        <source>We found the following updates:</source>
+        <translation>Были найдены следующие обновления:</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="102"/>
+        <source>Main programm</source>
+        <translation>Основная программа</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="103"/>
+        <location filename="../src/dialogupdate.cpp" line="108"/>
+        <source>Version: %1</source>
+        <translation>Версия: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="104"/>
+        <location filename="../src/dialogupdate.cpp" line="109"/>
+        <source>Changes: %1</source>
+        <translation>Изменения: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="107"/>
+        <source>Plugin name: %1</source>
+        <translation>Название плагина: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="114"/>
+        <source>Link update: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;</source>
+        <translation>Ссылка на обновление: &lt;a href=&quot;%1&quot;&gt;%1&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogupdate.cpp" line="116"/>
+        <source>Updates not found.</source>
+        <translation>Обновления не найдены.</translation>
     </message>
 </context>
 <context>
@@ -371,7 +430,7 @@
         <translation>О filmonaizer</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="55"/>
+        <location filename="../src/aboutdialog.ui" line="64"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -380,7 +439,7 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="87"/>
+        <location filename="../src/aboutdialog.ui" line="96"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -390,12 +449,11 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="133"/>
         <source>Check for updates</source>
-        <translation>Проверить наличие обновлений</translation>
+        <translation type="vanished">Проверить наличие обновлений</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="182"/>
+        <location filename="../src/aboutdialog.ui" line="162"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -448,7 +506,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://www.pinvoke.com/&quot;&gt;&lt;span style=&quot; font-size:9pt; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.pinvoke.com/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt; - за иконки.&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://mediainfo.sourceforge.net/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://mediainfo.sourceforge.net/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:9pt;&quot;&gt; - за библиотеку mediainfo.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="231"/>
+        <location filename="../src/aboutdialog.ui" line="211"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -457,17 +515,17 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="255"/>
+        <location filename="../src/aboutdialog.ui" line="235"/>
         <source>English</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="260"/>
+        <location filename="../src/aboutdialog.ui" line="240"/>
         <source>Русский</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/aboutdialog.ui" line="281"/>
+        <location filename="../src/aboutdialog.ui" line="261"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
@@ -617,7 +675,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/mainwindow.cpp" line="305"/>
         <location filename="../src/mainwindow.cpp" line="361"/>
-        <location filename="../src/mainwindow.cpp" line="1092"/>
+        <location filename="../src/mainwindow.cpp" line="1082"/>
         <source>Not search a template!</source>
         <translation>Не найдены шаблоны!</translation>
     </message>
@@ -632,90 +690,90 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="849"/>
-        <location filename="../src/mainwindow.cpp" line="1565"/>
+        <location filename="../src/mainwindow.cpp" line="839"/>
+        <location filename="../src/mainwindow.cpp" line="1555"/>
         <source>not exists file template</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="854"/>
-        <location filename="../src/mainwindow.cpp" line="1570"/>
+        <location filename="../src/mainwindow.cpp" line="844"/>
+        <location filename="../src/mainwindow.cpp" line="1560"/>
         <source>not open file template</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1201"/>
-        <location filename="../src/mainwindow.cpp" line="1300"/>
+        <location filename="../src/mainwindow.cpp" line="1191"/>
+        <location filename="../src/mainwindow.cpp" line="1290"/>
         <source>The file already exists.</source>
         <translation>Файл уже существует.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1202"/>
-        <location filename="../src/mainwindow.cpp" line="1301"/>
+        <location filename="../src/mainwindow.cpp" line="1192"/>
+        <location filename="../src/mainwindow.cpp" line="1291"/>
         <source>Rewrite?</source>
         <translation>Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1615"/>
+        <location filename="../src/mainwindow.cpp" line="1605"/>
         <source>Version: %1</source>
         <translation>Версия: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1617"/>
+        <location filename="../src/mainwindow.cpp" line="1607"/>
         <source>Description: %1
 Version: %2</source>
         <translation>Описание: %1
 Версия: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1629"/>
+        <location filename="../src/mainwindow.cpp" line="1619"/>
         <source>Are you sure you want to change the plugin? Search results will be lost.</source>
         <translation>Вы точно хотите сменить плагин? Результаты поиска будут утеряны.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1143"/>
-        <location filename="../src/mainwindow.cpp" line="1204"/>
-        <location filename="../src/mainwindow.cpp" line="1303"/>
-        <location filename="../src/mainwindow.cpp" line="1631"/>
+        <location filename="../src/mainwindow.cpp" line="1133"/>
+        <location filename="../src/mainwindow.cpp" line="1194"/>
+        <location filename="../src/mainwindow.cpp" line="1293"/>
+        <location filename="../src/mainwindow.cpp" line="1621"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1144"/>
-        <location filename="../src/mainwindow.cpp" line="1205"/>
-        <location filename="../src/mainwindow.cpp" line="1304"/>
-        <location filename="../src/mainwindow.cpp" line="1632"/>
+        <location filename="../src/mainwindow.cpp" line="1134"/>
+        <location filename="../src/mainwindow.cpp" line="1195"/>
+        <location filename="../src/mainwindow.cpp" line="1294"/>
+        <location filename="../src/mainwindow.cpp" line="1622"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1206"/>
-        <location filename="../src/mainwindow.cpp" line="1305"/>
+        <location filename="../src/mainwindow.cpp" line="1196"/>
+        <location filename="../src/mainwindow.cpp" line="1295"/>
         <source>Yes to all</source>
         <translation>Да для всех</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1207"/>
-        <location filename="../src/mainwindow.cpp" line="1306"/>
+        <location filename="../src/mainwindow.cpp" line="1197"/>
+        <location filename="../src/mainwindow.cpp" line="1296"/>
         <source>No to all</source>
         <translation>Нет для всех</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1141"/>
+        <location filename="../src/mainwindow.cpp" line="1131"/>
         <source>In pattern no tags {;path_save}, save in folder default?</source>
         <translation>В шаблоне нет тега {;path_save}, сохранить в папку по-умолчанию?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1169"/>
-        <location filename="../src/mainwindow.cpp" line="1177"/>
+        <location filename="../src/mainwindow.cpp" line="1159"/>
+        <location filename="../src/mainwindow.cpp" line="1167"/>
         <source>Could not create the folder where you want to save the result, saving cancel.</source>
         <translation>Не удалось создать папку, куда нужно сохранить результат, сохранение прервано.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="307"/>
         <location filename="../src/mainwindow.cpp" line="363"/>
-        <location filename="../src/mainwindow.cpp" line="1094"/>
-        <location filename="../src/mainwindow.cpp" line="1172"/>
+        <location filename="../src/mainwindow.cpp" line="1084"/>
+        <location filename="../src/mainwindow.cpp" line="1162"/>
         <source>Ok</source>
         <translation></translation>
     </message>
@@ -773,12 +831,12 @@ Version: %2</source>
         <translation type="vanished">Выберите директорию для сохранения результатов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1433"/>
+        <location filename="../src/mainwindow.cpp" line="1423"/>
         <source>Select a movie</source>
         <translation>Выберите фильм</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1435"/>
+        <location filename="../src/mainwindow.cpp" line="1425"/>
         <source>All Files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -841,6 +899,11 @@ Version: %2</source>
         <translation>Перезаписывать файл</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.ui" line="455"/>
+        <source>Search update</source>
+        <translation>Поиск обновлений</translation>
+    </message>
+    <message>
         <source>Yes</source>
         <translation type="vanished">Да</translation>
     </message>
@@ -862,7 +925,7 @@ Version: %2</source>
         <translation type="vanished">Очищать директрою Temp перед выходом</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="439"/>
+        <location filename="../src/mainwindow.ui" line="413"/>
         <source>Edit templates</source>
         <translation>Редактор шаблонов</translation>
     </message>
@@ -876,27 +939,26 @@ Version: %2</source>
         <translation>Плагины</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="384"/>
         <source>Search update plugins</source>
-        <translation>Поиск обновлений плагинов</translation>
+        <translation type="vanished">Поиск обновлений плагинов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="481"/>
+        <location filename="../src/mainwindow.ui" line="484"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="510"/>
+        <location filename="../src/mainwindow.ui" line="513"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="547"/>
+        <location filename="../src/mainwindow.ui" line="550"/>
         <source>Русский</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="555"/>
+        <location filename="../src/mainwindow.ui" line="558"/>
         <source>English</source>
         <translation></translation>
     </message>
@@ -980,19 +1042,16 @@ Version: %2</source>
 <context>
     <name>dialog_getupdates</name>
     <message>
-        <location filename="../src/dialog_getupdates.cpp" line="6"/>
         <source>Search updates</source>
-        <translation>Поиск обновлений</translation>
+        <translation type="vanished">Поиск обновлений</translation>
     </message>
     <message>
-        <location filename="../src/dialog_getupdates.cpp" line="19"/>
         <source>goes searching for of the updates programm</source>
-        <translation>Идет поиск обновлений программы</translation>
+        <translation type="vanished">Идет поиск обновлений программы</translation>
     </message>
     <message>
-        <location filename="../src/dialog_getupdates.cpp" line="26"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="vanished">Отмена</translation>
     </message>
 </context>
 <context>
@@ -1016,38 +1075,32 @@ Version: %2</source>
 <context>
     <name>dialog_version</name>
     <message>
-        <location filename="../src/dialog_version.cpp" line="9"/>
         <source>Update</source>
-        <translation>Обновление</translation>
+        <translation type="vanished">Обновление</translation>
     </message>
     <message>
-        <location filename="../src/dialog_version.cpp" line="13"/>
         <source>A new version of the program to download, the current version - %1, available version - %2.</source>
-        <translation>Доступна новая версия программы для загрузки, текущая версия - %1, доступная версия - %2.</translation>
+        <translation type="vanished">Доступна новая версия программы для загрузки, текущая версия - %1, доступная версия - %2.</translation>
     </message>
     <message>
-        <location filename="../src/dialog_version.cpp" line="15"/>
         <source>&lt;a href=&quot;http://wiki.soulruins.info/filmonaizer/downloads&quot;&gt;Go to download page...&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://wiki.soulruins.info/filmonaizer/downloads&quot;&gt;Перейти на страницу загрузки...&lt;/a&gt;</translation>
+        <translation type="vanished">&lt;a href=&quot;http://wiki.soulruins.info/filmonaizer/downloads&quot;&gt;Перейти на страницу загрузки...&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/dialog_version.cpp" line="31"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="vanished">Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/dialog_version.cpp" line="19"/>
         <source>What is new:
 
 %1</source>
-        <translation>Что нового:
+        <translation type="vanished">Что нового:
 
 %1</translation>
     </message>
     <message>
-        <location filename="../src/dialog_version.cpp" line="27"/>
         <source>do not remind about the update</source>
-        <translation>Больше не напоминать об этом обновлении</translation>
+        <translation type="vanished">Больше не напоминать об этом обновлении</translation>
     </message>
 </context>
 <context>

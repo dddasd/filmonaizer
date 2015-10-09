@@ -11,8 +11,6 @@ SOURCES += src/main.cpp \
     src/http_download.cpp \
     src/previewdesc.cpp \
     src/aboutdialog.cpp \
-    src/dialog_getupdates.cpp \
-    src/dialog_version.cpp \
     src/previewcover.cpp \
     src/edit_templates.cpp \
     src/dialog_variables.cpp \
@@ -24,8 +22,6 @@ HEADERS += src/mainwindow.h \
     src/http_download.h \
     src/previewdesc.h \
     src/aboutdialog.h \
-    src/dialog_getupdates.h \
-    src/dialog_version.h \
     src/previewcover.h \
     src/edit_templates.h \
     src/dialog_variables.h \
