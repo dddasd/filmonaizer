@@ -1,7 +1,7 @@
 Фильмонайзер / Filmonizer
 =========================
 
-- **Текущая версия:** 0.2.21
+- **Текущая версия:** 0.3.25
 - **Домашная страница:** http://wiki.soulruins.info/filmonaizer/start
 
 Описание:
@@ -32,13 +32,13 @@
 - http://www.pinvoke.com - за иконки
 - http://mediainfo.sourceforge.net - за библиотеку mediainfo
 - http://kinopoisk.ru - за информацию о фильмах
-- http://themoviedb.org - за информацию о фильмах (в разработке)
+- http://themoviedb.org - за информацию о фильмах
 
 Установка:
 ----------
-UBUNTU (проверено на версии 9.10):
+UBUNTU (проверено на версии 15.04):
 ```sh
-$sudo apt-get install libqt4-dev build-essential
+$sudo apt-get install libqt5-dev qt5-default
 $qmake filmonaizer.pro
 $make
 ```
