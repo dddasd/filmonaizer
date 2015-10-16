@@ -195,7 +195,6 @@ void PreviewCover::wheelEvent(QWheelEvent *event) {
 
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
-    qDebug() << numSteps;
 
     int tek = (-1);
     for(int i=0;i<list_image_sm->count();i++) {

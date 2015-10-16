@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Search Updates</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../icons/filmonaizer.qrc">
+    <normaloff>:/icons/arrow-circle-double.png</normaloff>:/icons/arrow-circle-double.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTextBrowser" name="textBrowserUpdate">
@@ -49,7 +53,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../icons/filmonaizer.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pushButton_close</sender>

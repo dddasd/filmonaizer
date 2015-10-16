@@ -262,6 +262,7 @@ void Edit_Templates::_triggered_open(QAction* ret) {
                     msgBox1.setButtonText(QMessageBox::No,tr("No"));
                     msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                     msgBox1.setDefaultButton(QMessageBox::Yes);
+                    msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                     int ret2 = msgBox1.exec();
                     switch (ret2) {
                         case QMessageBox::Yes: {
@@ -307,6 +308,7 @@ void Edit_Templates::_triggered_open(QAction* ret) {
                                     msgBox1.setButtonText(QMessageBox::No,tr("No"));
                                     msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                                     msgBox1.setDefaultButton(QMessageBox::Yes);
+                                    msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                                     int ret2 = msgBox1.exec();
                                     switch (ret2) {
                                         case QMessageBox::Yes: {
@@ -382,6 +384,7 @@ void Edit_Templates::_triggered_open(QAction* ret) {
             msgBox.setButtonText(QMessageBox::Cancel,tr("Cancel"));
             msgBox.setButtonText(QMessageBox::SaveAll,tr("Save as..."));
             msgBox.setDefaultButton(QMessageBox::Save);
+            msgBox.setWindowIcon(QIcon(":icons/information.png"));
             int ret1 = msgBox.exec();
             switch (ret1) {
                 case QMessageBox::Save: {
@@ -498,6 +501,7 @@ void Edit_Templates::_triggered_open(QAction* ret) {
                             msgBox1.setButtonText(QMessageBox::No,tr("No"));
                             msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                             msgBox1.setDefaultButton(QMessageBox::Yes);
+                            msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                             int ret2 = msgBox1.exec();
                             switch (ret2) {
                                 case QMessageBox::Yes: {
@@ -721,6 +725,7 @@ void Edit_Templates::new_file() {
         msgBox.setButtonText(QMessageBox::Cancel,tr("Cancel"));
         msgBox.setButtonText(QMessageBox::SaveAll,tr("Save as..."));
         msgBox.setDefaultButton(QMessageBox::Save);
+        msgBox.setWindowIcon(QIcon(":icons/information.png"));
         int ret1 = msgBox.exec();
         switch (ret1) {
             case QMessageBox::Save: {
@@ -748,6 +753,7 @@ void Edit_Templates::new_file() {
                             msgBox1.setButtonText(QMessageBox::No,tr("No"));
                             msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                             msgBox1.setDefaultButton(QMessageBox::Yes);
+                            msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                             int ret2 = msgBox1.exec();
                             switch (ret2) {
                                 case QMessageBox::Yes: {
@@ -902,6 +908,7 @@ void Edit_Templates::new_file() {
                         msgBox1.setButtonText(QMessageBox::No,tr("No"));
                         msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                         msgBox1.setDefaultButton(QMessageBox::Yes);
+                        msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                         int ret2 = msgBox1.exec();
                         switch (ret2) {
                             case QMessageBox::Yes: {
@@ -1029,6 +1036,7 @@ void Edit_Templates::save_file() {
                 msgBox1.setButtonText(QMessageBox::No,tr("No"));
                 msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                 msgBox1.setDefaultButton(QMessageBox::Yes);
+                msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                 int ret1 = msgBox1.exec();
                 switch (ret1) {
                     case QMessageBox::Yes: {
@@ -1107,6 +1115,7 @@ void Edit_Templates::save_file() {
         msgBox.setButtonText(QMessageBox::No,tr("No"));
         msgBox.setButtonText(QMessageBox::Cancel,tr("Cancel"));
         msgBox.setDefaultButton(QMessageBox::Yes);
+        msgBox.setWindowIcon(QIcon(":icons/information.png"));
         int ret = msgBox.exec();
         switch (ret) {
             case QMessageBox::Yes: {
@@ -1167,6 +1176,7 @@ void Edit_Templates::save_file() {
                         msgBox1.setButtonText(QMessageBox::No,tr("No"));
                         msgBox1.setButtonText(QMessageBox::Cancel,tr("Cancel"));
                         msgBox1.setDefaultButton(QMessageBox::Yes);
+                        msgBox1.setWindowIcon(QIcon(":icons/information.png"));
                         int ret1 = msgBox1.exec();
                         switch (ret1) {
                             case QMessageBox::Yes: {
@@ -1265,6 +1275,7 @@ void Edit_Templates::delete_file() {
         msgBox1.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox1.setButtonText(QMessageBox::Yes,tr("Yes"));
         msgBox1.setButtonText(QMessageBox::No,tr("No"));
+        msgBox1.setWindowIcon(QIcon(":icons/information.png"));
         int ret=msgBox1.exec();
         switch (ret) {
             case QMessageBox::Yes: {

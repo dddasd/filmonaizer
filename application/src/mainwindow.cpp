@@ -1621,7 +1621,7 @@ void MainWindow::comb_plug_indexChanged(int index) {
         msgBox.setButtonText(QMessageBox::Yes,tr("Yes"));
         msgBox.setButtonText(QMessageBox::No,tr("No"));
         msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowIcon(QIcon(":icons/information.png"));
         switch (msgBox.exec()) {
             case QMessageBox::Yes:
                 Fcurrent_plugins_search = FlistPluginsSearch[index].filename;
